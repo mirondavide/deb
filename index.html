@@ -1268,7 +1268,7 @@
         });
 
         // ===== FORM HANDLING =====
-        const CLOUD_FUNCTION_URL = 'https://script.google.com/macros/s/AKfycbzrm9nOnOuTNnd3EnV1rAguqOA6sy57OpvBiuL2iICUSU5W0mVhgXoE20TxqvONEMOPNw/exec';
+        const GOOGLE_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSeUitUmMJc55uMaEtBLHF1H1LOcRME3DTVtTG1iI3Gdjpcb6w/formResponse';
 
         const form = document.getElementById('waitlistForm');
         const submitBtn = document.getElementById('submitBtn');
@@ -1281,18 +1281,17 @@
             submitBtn.disabled = true;
             submitBtn.textContent = 'Joining...';
 
-            const data = {
-                email: document.getElementById('email').value.trim().toLowerCase(),
-                linkedin: document.getElementById('linkedin').value.trim(),
-                price: document.getElementById('price').value,
-                role: document.getElementById('role').value,
-            };
+            const formData = new FormData();
+            formData.append('entry.1987568372', document.getElementById('email').value.trim().toLowerCase());
+            formData.append('entry.1176068081', document.getElementById('linkedin').value.trim());
+            formData.append('entry.90417696', document.getElementById('price').value);
+            formData.append('entry.1087707908', document.getElementById('role').value);
 
             try {
-                await fetch(CLOUD_FUNCTION_URL, {
+                await fetch(GOOGLE_FORM_URL, {
                     method: 'POST',
                     mode: 'no-cors',
-                    body: JSON.stringify(data),
+                    body: formData,
                 });
 
                 form.style.display = 'none';
