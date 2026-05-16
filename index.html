@@ -1138,9 +1138,8 @@
                 <div class="success-state" id="successState">
                     <div class="success-icon">&#127881;</div>
                     <h3>You're on the list!</h3>
-                    <p>Your waitlist position:</p>
-                    <div class="position-number" id="positionNumber">#—</div>
-                    <p class="position-label">We'll notify you when it's your turn.</p>
+                    <p>We'll notify you when Debut launches.</p>
+                    <p class="position-label">Keep an eye on your inbox!</p>
                 </div>
             </div>
         </div>
@@ -1290,26 +1289,17 @@
             };
 
             try {
-                const response = await fetch(CLOUD_FUNCTION_URL, {
+                await fetch(CLOUD_FUNCTION_URL, {
                     method: 'POST',
+                    mode: 'no-cors',
                     body: JSON.stringify(data),
                 });
 
-                const text = await response.text();
-                const result = JSON.parse(text);
-
-                if (result.error) {
-                    throw new Error(result.error);
-                }
-
                 form.style.display = 'none';
                 successState.classList.add('active');
-                document.getElementById('positionNumber').textContent = `#${result.position}`;
 
             } catch (err) {
-                errorMsg.textContent = err.message === 'This email is already on the waitlist'
-                    ? 'This email is already on the waitlist!'
-                    : 'Something went wrong. Please try again.';
+                errorMsg.textContent = 'Something went wrong. Please try again.';
                 errorMsg.classList.add('active');
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Join the Waitlist';
