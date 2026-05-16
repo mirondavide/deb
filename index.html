@@ -1269,7 +1269,7 @@
         });
 
         // ===== FORM HANDLING =====
-        const CLOUD_FUNCTION_URL = 'YOUR_CLOUD_FUNCTION_URL';
+        const CLOUD_FUNCTION_URL = 'https://script.google.com/macros/s/AKfycbzrm9nOnOuTNnd3EnV1rAguqOA6sy57OpvBiuL2iICUSU5W0mVhgXoE20TxqvONEMOPNw/exec';
 
         const form = document.getElementById('waitlistForm');
         const submitBtn = document.getElementById('submitBtn');
@@ -1292,14 +1292,14 @@
             try {
                 const response = await fetch(CLOUD_FUNCTION_URL, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data),
+                    redirect: 'follow',
                 });
 
                 const result = await response.json();
 
-                if (!response.ok) {
-                    throw new Error(result.error || 'Something went wrong');
+                if (result.error) {
+                    throw new Error(result.error);
                 }
 
                 form.style.display = 'none';
