@@ -1278,14 +1278,46 @@
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             errorMsg.classList.remove('active');
+
+            const email = document.getElementById('email').value.trim().toLowerCase();
+            const linkedin = document.getElementById('linkedin').value.trim();
+            const price = document.getElementById('price').value;
+            const role = document.getElementById('role').value;
+
+            // Validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                errorMsg.textContent = 'Please enter a valid email address.';
+                errorMsg.classList.add('active');
+                return;
+            }
+
+            if (linkedin && !linkedin.match(/^https?:\/\/(www\.)?linkedin\.com\//)) {
+                errorMsg.textContent = 'Please enter a valid LinkedIn URL (e.g. https://linkedin.com/in/yourname).';
+                errorMsg.classList.add('active');
+                return;
+            }
+
+            if (!price || isNaN(price) || Number(price) < 0) {
+                errorMsg.textContent = 'Please enter a valid price (0 or more).';
+                errorMsg.classList.add('active');
+                return;
+            }
+
+            if (!role) {
+                errorMsg.textContent = 'Please select your background.';
+                errorMsg.classList.add('active');
+                return;
+            }
+
             submitBtn.disabled = true;
             submitBtn.textContent = 'Joining...';
 
             const formData = new FormData();
-            formData.append('entry.1987568372', document.getElementById('email').value.trim().toLowerCase());
-            formData.append('entry.1176068081', document.getElementById('linkedin').value.trim());
-            formData.append('entry.90417696', document.getElementById('price').value);
-            formData.append('entry.1087707908', document.getElementById('role').value);
+            formData.append('entry.1987568372', email);
+            formData.append('entry.1176068081', linkedin);
+            formData.append('entry.90417696', price);
+            formData.append('entry.1087707908', role);
 
             try {
                 await fetch(GOOGLE_FORM_URL, {
