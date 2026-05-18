@@ -9,20 +9,21 @@
     <meta property="og:type" content="website">
     <meta property="og:title" content="Debut — Swipe your way into your dream startup job">
     <meta property="og:description" content="Discover curated startup roles, swipe to apply instantly, and track everything in one place. No cover letters required.">
-    <meta property="og:image" content="og-image.png">
+    <meta property="og:image" content="https://debutapp.com/og-image.png">
     <meta property="og:url" content="https://debutapp.com">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Debut — Swipe your way into your dream startup job">
     <meta name="twitter:description" content="Discover curated startup roles, swipe to apply instantly, and track everything in one place. No cover letters required.">
-    <meta name="twitter:image" content="og-image.png">
+    <meta name="twitter:image" content="https://debutapp.com/og-image.png">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
 
     <!-- Three.js -->
-    <button class="music-toggle" id="musicToggle">♪ MUSIC: OFF</button>
+    <button class="music-toggle" id="musicToggle" aria-label="Toggle background music">♪ MUSIC: OFF</button>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>if (typeof THREE === 'undefined') { document.write('<script src="three.min.js"><\/script>'); }</script>
 
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -420,9 +421,10 @@
     </style>
 </head>
 <body>
+    <a href="#homePage" class="skip-link" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;z-index:10000;padding:8px 16px;background:#00FF41;color:#0a0a0a;font-family:'VT323',monospace;font-size:1.2rem;text-decoration:none;" onfocus="this.style.left='16px';this.style.width='auto';this.style.height='auto'" onblur="this.style.left='-9999px';this.style.width='1px';this.style.height='1px'">Skip to content</a>
 
     <!-- ===== 3D INTRO ===== -->
-    <div id="intro-container">
+    <div id="intro-container" role="img" aria-label="3D animated desk scene introduction">
         <div id="intro-overlay">
             <div style="text-align:center">
                 <div class="intro-title" id="introTitle">{ debut }</div>
@@ -431,7 +433,7 @@
         </div>
     </div>
     <div id="intro-fadeout"></div>
-    <canvas id="glitch-canvas"></canvas>
+    <canvas id="glitch-canvas" aria-hidden="true"></canvas>
 
     <!-- ===== HOME ===== -->
     <div class="page active" id="homePage">
@@ -446,28 +448,28 @@
     <!-- ===== APPLY ===== -->
     <div class="page" id="applyPage">
         <div class="page-top">
-            <button class="back-link" id="backFromApply">[ESC] BACK</button>
+            <button class="back-link" id="backFromApply" aria-label="Go back to home page">[ESC] BACK</button>
             <div id="applyContent"></div>
 
             <div style="height:20px"></div>
 
             <div class="error-msg" id="errorMsg"></div>
 
-            <form id="waitlistForm" style="display:none">
+            <form id="waitlistForm" style="display:none" aria-label="Waitlist signup form">
                 <div class="form-group">
-                    <label>EMAIL ADDRESS</label>
+                    <label for="email">EMAIL ADDRESS</label>
                     <input type="email" id="email" name="email" placeholder="you@example.com" required>
                 </div>
                 <div class="form-group">
-                    <label>LINKEDIN PROFILE <span class="opt">(OPTIONAL)</span></label>
+                    <label for="linkedin">LINKEDIN PROFILE <span class="opt">(OPTIONAL)</span></label>
                     <input type="url" id="linkedin" name="linkedin" placeholder="https://linkedin.com/in/yourname">
                 </div>
                 <div class="form-group">
-                    <label>HOW MUCH WOULD YOU PAY MONTHLY? ($/MO)</label>
+                    <label for="price">HOW MUCH WOULD YOU PAY MONTHLY? ($/MO)</label>
                     <input type="number" id="price" name="price" placeholder="e.g. 5" min="0" step="1" required>
                 </div>
                 <div class="form-group">
-                    <label>WHAT BEST DESCRIBES YOU?</label>
+                    <label for="role">WHAT BEST DESCRIBES YOU?</label>
                     <select id="role" name="role" required>
                         <option value="" disabled selected>-- SELECT --</option>
                         <option value="student">Student / Undergrad</option>
@@ -480,7 +482,7 @@
                         <option value="other">Other</option>
                     </select>
                 </div>
-                <button type="submit" class="submit-btn" id="submitBtn">[ SUBMIT ]</button>
+                <button type="submit" class="submit-btn" id="submitBtn" aria-label="Submit waitlist form">[ SUBMIT ]</button>
                 <p class="form-note">no spam, ever. we'll only email you when debut launches.</p>
             </form>
 
@@ -497,7 +499,7 @@
     <!-- ===== MANIFESTO ===== -->
     <div class="page" id="manifestoPage">
         <div class="page-top">
-            <button class="back-link" id="backFromManifesto">[ESC] BACK</button>
+            <button class="back-link" id="backFromManifesto" aria-label="Go back to home page">[ESC] BACK</button>
             <div id="manifestoContent"></div>
         </div>
         <div class="page-footer">
@@ -508,42 +510,42 @@
     <!-- ===== FAQ ===== -->
     <div class="page" id="faqPage">
         <div class="page-top">
-            <button class="back-link" id="backFromFaq">[ESC] BACK</button>
+            <button class="back-link" id="backFromFaq" aria-label="Go back to home page">[ESC] BACK</button>
             <div style="height: 32px"></div>
-            <div id="faqAccordion">
+            <div id="faqAccordion" role="region" aria-label="Frequently asked questions">
                 <div class="faq-item active-item" data-faq="0">
-                    <div class="faq-question">&gt; [+] What is Debut?</div>
-                    <div class="faq-answer">A tinder-style job discovery app for startups. Swipe through curated roles, apply instantly, and track everything in one place.</div>
+                    <div class="faq-question" role="button" tabindex="0" aria-expanded="true">&gt; [+] What is Debut?</div>
+                    <div class="faq-answer" role="region">A tinder-style job discovery app for startups. Swipe through curated roles, apply instantly, and track everything in one place.</div>
                 </div>
 
                 <div class="faq-item" data-faq="1">
-                    <div class="faq-question">&gt; [+] Who is Debut for?</div>
-                    <div class="faq-answer">Anyone looking for startup roles — students, recent grads, career switchers, junior engineers, designers, marketers, and product managers.</div>
+                    <div class="faq-question" role="button" tabindex="0" aria-expanded="false">&gt; [+] Who is Debut for?</div>
+                    <div class="faq-answer" role="region">Anyone looking for startup roles — students, recent grads, career switchers, junior engineers, designers, marketers, and product managers.</div>
                 </div>
 
                 <div class="faq-item" data-faq="2">
-                    <div class="faq-question">&gt; [+] When does it launch?</div>
-                    <div class="faq-answer">Soon on iOS and Android. Join the waitlist to be among the first to know.</div>
+                    <div class="faq-question" role="button" tabindex="0" aria-expanded="false">&gt; [+] When does it launch?</div>
+                    <div class="faq-answer" role="region">Soon on iOS and Android. Join the waitlist to be among the first to know.</div>
                 </div>
 
                 <div class="faq-item" data-faq="3">
-                    <div class="faq-question">&gt; [+] Is it free?</div>
-                    <div class="faq-answer">We're still figuring out pricing. Your input on the waitlist form helps us decide what's fair.</div>
+                    <div class="faq-question" role="button" tabindex="0" aria-expanded="false">&gt; [+] Is it free?</div>
+                    <div class="faq-answer" role="region">We're still figuring out pricing. Your input on the waitlist form helps us decide what's fair.</div>
                 </div>
 
                 <div class="faq-item" data-faq="4">
-                    <div class="faq-question">&gt; [+] How is it different from LinkedIn?</div>
-                    <div class="faq-answer">LinkedIn is a professional network. Debut is a job discovery tool built for speed. No profiles to polish, no cover letters to write. Just swipe and apply.</div>
+                    <div class="faq-question" role="button" tabindex="0" aria-expanded="false">&gt; [+] How is it different from LinkedIn?</div>
+                    <div class="faq-answer" role="region">LinkedIn is a professional network. Debut is a job discovery tool built for speed. No profiles to polish, no cover letters to write. Just swipe and apply.</div>
                 </div>
 
                 <div class="faq-item" data-faq="5">
-                    <div class="faq-question">&gt; [+] Can I use Debut while employed?</div>
-                    <div class="faq-answer">Absolutely. Debut is designed for quick, casual browsing. Swipe through roles in minutes — no one needs to know.</div>
+                    <div class="faq-question" role="button" tabindex="0" aria-expanded="false">&gt; [+] Can I use Debut while employed?</div>
+                    <div class="faq-answer" role="region">Absolutely. Debut is designed for quick, casual browsing. Swipe through roles in minutes — no one needs to know.</div>
                 </div>
 
                 <div class="faq-item" data-faq="6">
-                    <div class="faq-question">&gt; [+] Do I need a cover letter?</div>
-                    <div class="faq-answer">No. One swipe sends your profile directly to the startup. Zero forms, zero friction.</div>
+                    <div class="faq-question" role="button" tabindex="0" aria-expanded="false">&gt; [+] Do I need a cover letter?</div>
+                    <div class="faq-answer" role="region">No. One swipe sends your profile directly to the startup. Zero forms, zero friction.</div>
                 </div>
             </div>
 
@@ -625,6 +627,8 @@
                 const a = document.createElement('span');
                 a.className = 'menu-item' + (cfg.boxed ? ' boxed' : '');
                 a.id = cfg.menuId || '';
+                a.setAttribute('role', 'button');
+                a.setAttribute('tabindex', '0');
                 el.appendChild(a);
                 typeChars(a, cfg.text, 0, () => {
                     setTimeout(nextLine, cfg.pause || 90);
@@ -680,12 +684,31 @@
     ];
 
     // FAQ accordion logic
-    document.getElementById('faqAccordion').addEventListener('click', (e) => {
-        const item = e.target.closest('.faq-item');
+    function toggleFaqItem(item) {
         if (!item) return;
         const wasActive = item.classList.contains('active-item');
-        document.querySelectorAll('.faq-item').forEach(el => el.classList.remove('active-item'));
-        if (!wasActive) item.classList.add('active-item');
+        document.querySelectorAll('.faq-item').forEach(el => {
+            el.classList.remove('active-item');
+            const q = el.querySelector('.faq-question');
+            if (q) q.setAttribute('aria-expanded', 'false');
+        });
+        if (!wasActive) {
+            item.classList.add('active-item');
+            const q = item.querySelector('.faq-question');
+            if (q) q.setAttribute('aria-expanded', 'true');
+        }
+    }
+    document.getElementById('faqAccordion').addEventListener('click', (e) => {
+        toggleFaqItem(e.target.closest('.faq-item'));
+    });
+    document.getElementById('faqAccordion').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            const question = e.target.closest('.faq-question');
+            if (question) {
+                e.preventDefault();
+                toggleFaqItem(question.closest('.faq-item'));
+            }
+        }
     });
 
     // ===== NAVIGATION =====
@@ -715,6 +738,8 @@
                 const a = document.createElement('span');
                 a.className = 'menu-item' + (cfg.boxed ? ' boxed' : '');
                 a.id = cfg.menuId || '';
+                a.setAttribute('role', 'button');
+                a.setAttribute('tabindex', '0');
                 a.textContent = cfg.text;
                 el.appendChild(a);
             } else {
@@ -852,7 +877,41 @@
         showPage('home');
     }
 
+    // ================================================================
+    //  DEVICE CAPABILITY CHECK — skip 3D intro on low-end devices
+    // ================================================================
+    var __skipIntro = (function() {
+        var dominated = false;
+        var cores = navigator.hardwareConcurrency || 0;
+        var mem = navigator.deviceMemory || 0;
+        var width = screen.width;
+        var isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
+        if (cores > 0 && cores <= 2) dominated = true;
+        if (mem > 0 && mem <= 2) dominated = true;
+        if (isMobile && width <= 768) dominated = true;
+
+        if (!dominated) {
+            try {
+                var c = document.createElement('canvas');
+                var gl = c.getContext('webgl') || c.getContext('experimental-webgl');
+                if (!gl) dominated = true;
+            } catch (e) { dominated = true; }
+        }
+
+        if (dominated) {
+            var ic = document.getElementById('intro-container');
+            var fo = document.getElementById('intro-fadeout');
+            var gc = document.getElementById('glitch-canvas');
+            if (ic) ic.style.display = 'none';
+            if (fo) fo.style.display = 'none';
+            if (gc) gc.style.display = 'none';
+            boot();
+        }
+        return dominated;
+    })();
+
+    if (!__skipIntro) {
     // ================================================================
     //  POST-PROCESSING OVERLAY — scanlines, grain, vignette, bloom
     // ================================================================
@@ -2441,6 +2500,7 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
     })();
+    } // end if (!__skipIntro)
     // ===== FORM HANDLING =====
     const GOOGLE_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSeUitUmMJc55uMaEtBLHF1H1LOcRME3DTVtTG1iI3Gdjpcb6w/formResponse';
 
@@ -2502,15 +2562,22 @@
     });
 
     // ===== BACKGROUND MUSIC =====
-    var bgMusic = new Audio('bg-music.mp3');
-    bgMusic.loop = true;
-    bgMusic.volume = 0;
+    var bgMusic = null;
+    function ensureBgMusic() {
+        if (!bgMusic) {
+            bgMusic = new Audio('bg-music.mp3');
+            bgMusic.loop = true;
+            bgMusic.volume = 0;
+        }
+        return bgMusic;
+    }
 
     var musicBtn = document.getElementById('musicToggle');
     var musicPlaying = false;
     var musicFadeInterval = null;
 
     function fadeInMusic() {
+        ensureBgMusic();
         bgMusic.currentTime = 15;
         bgMusic.volume = 0;
         bgMusic.play().then(function() {
@@ -2539,6 +2606,7 @@
             musicPlaying = false;
             musicBtn.textContent = '♪ MUSIC: OFF';
         } else {
+            ensureBgMusic();
             bgMusic.currentTime = bgMusic.currentTime || 15;
             bgMusic.volume = 0.15;
             bgMusic.play();
