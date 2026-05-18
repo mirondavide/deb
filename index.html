@@ -19,6 +19,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -292,15 +296,106 @@
 
         .back-link:hover { opacity: 0.55; }
 
+        /* ===== 3D INTRO ===== */
+        #intro-container {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background: #000;
+            cursor: pointer;
+        }
+
+        #intro-container canvas {
+            display: block;
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        #intro-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1001;
+            pointer-events: none;
+        }
+
+        .intro-title {
+            font-family: 'VT323', monospace;
+            font-size: 2.6rem;
+            letter-spacing: 0.28em;
+            color: rgba(255, 255, 255, 0.85);
+            text-transform: lowercase;
+            user-select: none;
+            opacity: 0;
+            animation: introFadeIn 1.2s ease forwards;
+            text-shadow: 0 0 20px rgba(0,255,65,0.4), 0 0 60px rgba(0,255,65,0.15);
+        }
+
+        .intro-title.hide {
+            transition: opacity 0.6s ease;
+            opacity: 0 !important;
+        }
+
+        .intro-hint {
+            font-family: 'VT323', monospace;
+            font-size: 1.15rem;
+            letter-spacing: 0.15em;
+            color: rgba(255, 255, 255, 0.35);
+            text-transform: lowercase;
+            user-select: none;
+            margin-top: 24px;
+            opacity: 0;
+            animation: introFadeIn 1.2s ease forwards;
+        }
+
+        .intro-hint.hide {
+            transition: opacity 0.4s ease;
+            opacity: 0 !important;
+        }
+
+
+        @keyframes introFadeIn {
+            0% { opacity: 0; transform: translateY(12px) scale(0.95); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* Fade-out overlay for transition to terminal */
+        #intro-fadeout {
+            position: fixed;
+            inset: 0;
+            z-index: 1002;
+            background: #0a0a0a;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.8s ease;
+        }
+
+        #intro-fadeout.active { opacity: 1; }
+
         /* ===== RESPONSIVE ===== */
         @media (max-width: 640px) {
             .page { padding: 36px 24px; }
             .line { font-size: 1.05rem; }
             .menu-item.boxed { margin-left: -8px; }
+            .intro-title { font-size: 2.2rem; }
+            .intro-hint { font-size: 1.1rem; }
         }
     </style>
 </head>
 <body>
+
+    <!-- ===== 3D INTRO ===== -->
+    <div id="intro-container">
+        <div id="intro-overlay">
+            <div style="text-align:center">
+                <div class="intro-title" id="introTitle">{ debut }</div>
+                <div class="intro-hint" id="introHint">tap anywhere to enter</div>
+            </div>
+        </div>
+    </div>
+    <div id="intro-fadeout"></div>
 
     <!-- ===== HOME ===== -->
     <div class="page active" id="homePage">
@@ -442,20 +537,17 @@
         const t = ctx.currentTime;
         const p = 0.9 + Math.random() * 0.2;
 
-        // Thunk
         const s1 = ctx.createBufferSource(); s1.buffer = noiseBuffer;
         const f1 = ctx.createBiquadFilter(); f1.type = 'lowpass'; f1.frequency.value = 600 * p; f1.Q.value = 0.7;
         const g1 = ctx.createGain(); g1.gain.setValueAtTime(0.12, t); g1.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
         s1.connect(f1); f1.connect(g1); g1.connect(ctx.destination); s1.start(t); s1.stop(t + 0.05);
 
-        // Click
         const s2 = ctx.createBufferSource(); s2.buffer = noiseBuffer;
         const f2 = ctx.createBiquadFilter(); f2.type = 'bandpass'; f2.frequency.value = 4000 * p; f2.Q.value = 2;
         const g2 = ctx.createGain(); g2.gain.setValueAtTime(0.06, t); g2.gain.exponentialRampToValueAtTime(0.001, t + 0.018);
         s2.connect(f2); f2.connect(g2); g2.connect(ctx.destination); s2.start(t); s2.stop(t + 0.02);
     }
 
-    // Sound on form typing
     document.addEventListener('keydown', (e) => {
         if (!audioCtx) return;
         const tag = e.target.tagName;
@@ -463,14 +555,12 @@
     });
 
     // ===== TYPEWRITER ENGINE =====
-    // Types text into a container, character by character, with sound
     function typewrite(container, lines, onDone) {
         container.innerHTML = '';
         let lineIdx = 0;
 
         function nextLine() {
             if (lineIdx >= lines.length) {
-                // Add blinking cursor at the end
                 const cursorEl = document.createElement('span');
                 cursorEl.className = 'cursor';
                 container.appendChild(cursorEl);
@@ -481,7 +571,6 @@
             const cfg = lines[lineIdx];
             lineIdx++;
 
-            // Spacer
             if (cfg.type === 'spacer') {
                 const sp = document.createElement('div');
                 sp.className = 'spacer';
@@ -490,14 +579,12 @@
                 return;
             }
 
-            // Create the line element
             const el = document.createElement('div');
             el.className = 'line' + (cfg.body ? ' line-body' : '');
             if (cfg.cls) el.className += ' ' + cfg.cls;
             if (cfg.id) el.id = cfg.id;
             container.appendChild(el);
 
-            // If it's a menu item, wrap in a clickable span
             if (cfg.menu) {
                 const a = document.createElement('span');
                 a.className = 'menu-item' + (cfg.boxed ? ' boxed' : '');
@@ -514,20 +601,13 @@
         }
 
         function typeChars(el, text, idx, done) {
-            if (idx >= text.length) {
-                done();
-                return;
-            }
-
+            if (idx >= text.length) { done(); return; }
             el.textContent += text[idx];
             typeSound();
-
-            // Variable speed: faster for spaces, slight randomness
             const ch = text[idx];
             let delay = 35 + Math.random() * 25;
             if (ch === ' ') delay = 20 + Math.random() * 15;
             if (ch === '.' || ch === '—' || ch === ',') delay = 80 + Math.random() * 40;
-
             setTimeout(() => typeChars(el, text, idx + 1, done), delay);
         }
 
@@ -568,11 +648,8 @@
         const item = e.target.closest('.faq-item');
         if (!item) return;
         typeSound();
-
         const wasActive = item.classList.contains('active-item');
-        // Close all
         document.querySelectorAll('.faq-item').forEach(el => el.classList.remove('active-item'));
-        // Open clicked (unless it was already open)
         if (!wasActive) item.classList.add('active-item');
     });
 
@@ -605,7 +682,6 @@
         } else if (name === 'manifesto') {
             typewrite(document.getElementById('manifestoContent'), manifestoLines);
         } else if (name === 'faq') {
-            // Accordion is static, just reset to first item open
             document.querySelectorAll('.faq-item').forEach((el, i) => {
                 el.classList.toggle('active-item', i === 0);
             });
@@ -621,23 +697,18 @@
         if (f) f.addEventListener('click', () => showPage('faq'));
     }
 
-    // Back buttons
     document.getElementById('backFromApply').addEventListener('click', () => showPage('home'));
     document.getElementById('backFromManifesto').addEventListener('click', () => showPage('home'));
     document.getElementById('backFromFaq').addEventListener('click', () => showPage('home'));
 
-    // Keyboard nav — arrow keys move selection, Enter opens it
     let selectedMenu = 0;
     const menuTargets = ['apply', 'manifesto', 'faq'];
 
     function updateMenuHighlight() {
         const items = document.querySelectorAll('#homeContent .menu-item');
         items.forEach((el, i) => {
-            if (i === selectedMenu) {
-                el.classList.add('boxed');
-            } else {
-                el.classList.remove('boxed');
-            }
+            if (i === selectedMenu) el.classList.add('boxed');
+            else el.classList.remove('boxed');
         });
         typeSound();
     }
@@ -665,7 +736,6 @@
             else if (e.key === '3') { selectedMenu = 2; showPage('faq'); }
         }
 
-        // Arrow keys in FAQ accordion
         if (pages.faq.classList.contains('active')) {
             const tag = e.target.tagName;
             if (tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA') return;
@@ -691,28 +761,460 @@
     });
 
     // ===== BOOT =====
-    // Start typing on first click (browsers need interaction for audio)
     function boot() {
         initAudio();
         showPage('home');
     }
 
-    // Show a "click to start" prompt, then boot
-    const homeContent = document.getElementById('homeContent');
-    const startLine = document.createElement('div');
-    startLine.className = 'line';
-    startLine.style.cursor = 'pointer';
-    startLine.style.opacity = '0.5';
-    startLine.textContent = 'CLICK ANYWHERE TO START';
-    const startCursor = document.createElement('span');
-    startCursor.className = 'cursor';
-    startLine.appendChild(startCursor);
-    homeContent.appendChild(startLine);
+    // ================================================================
+    //  THREE.JS 3D INTRO — Full WebGL experience
+    // ================================================================
+    (function() {
+        const container = document.getElementById('intro-container');
+        const introTitle = document.getElementById('introTitle');
+        const fadeout = document.getElementById('intro-fadeout');
 
-    document.addEventListener('click', function firstClick() {
-        document.removeEventListener('click', firstClick);
-        boot();
-    });
+        const GREEN = new THREE.Color(0x00FF41);
+        const DARK_GREEN = new THREE.Color(0x003300);
+        const WHITE = new THREE.Color(0xffffff);
+
+        // --- Scene setup ---
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x000000, 0.0025);
+
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 2000);
+        camera.position.set(0, 0, 0);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setClearColor(0x000000);
+        container.insertBefore(renderer.domElement, container.firstChild);
+
+        // --- Tunnel rings ---
+        const RING_COUNT = 80;
+        const RING_SPACING = 12;
+        const RING_RADIUS = 18;
+        const rings = [];
+
+        for (let i = 0; i < RING_COUNT; i++) {
+            const segments = 8 + Math.floor(Math.random() * 5); // Octagonal to dodecagonal
+            const geo = new THREE.RingGeometry(RING_RADIUS - 0.15, RING_RADIUS + 0.15, segments);
+            const mat = new THREE.MeshBasicMaterial({
+                color: GREEN.clone(),
+                transparent: true,
+                opacity: 0.0,
+                side: THREE.DoubleSide,
+                wireframe: false,
+            });
+            const mesh = new THREE.Mesh(geo, mat);
+            mesh.position.z = -(i * RING_SPACING);
+            mesh.rotation.z = Math.random() * Math.PI;
+            mesh.userData = {
+                baseZ: mesh.position.z,
+                rotSpeed: (Math.random() - 0.5) * 0.4,
+                segments: segments,
+            };
+            scene.add(mesh);
+            rings.push(mesh);
+        }
+
+        // --- Inner wireframe rings (smaller, different rotation) ---
+        const innerRings = [];
+        for (let i = 0; i < RING_COUNT; i++) {
+            const geo = new THREE.RingGeometry(RING_RADIUS * 0.55, RING_RADIUS * 0.58, 6);
+            const mat = new THREE.MeshBasicMaterial({
+                color: GREEN.clone(),
+                transparent: true,
+                opacity: 0.0,
+                side: THREE.DoubleSide,
+            });
+            const mesh = new THREE.Mesh(geo, mat);
+            mesh.position.z = -(i * RING_SPACING) - RING_SPACING * 0.5;
+            mesh.rotation.z = Math.random() * Math.PI;
+            mesh.userData = { rotSpeed: (Math.random() - 0.5) * -0.6 };
+            scene.add(mesh);
+            innerRings.push(mesh);
+        }
+
+        // --- Grid floor and ceiling ---
+        const gridGeo = new THREE.PlaneGeometry(200, RING_COUNT * RING_SPACING, 80, RING_COUNT * 2);
+        const gridMat = new THREE.MeshBasicMaterial({
+            color: GREEN.clone(),
+            wireframe: true,
+            transparent: true,
+            opacity: 0.0,
+        });
+        const gridFloor = new THREE.Mesh(gridGeo, gridMat);
+        gridFloor.rotation.x = -Math.PI / 2;
+        gridFloor.position.set(0, -RING_RADIUS, -(RING_COUNT * RING_SPACING) / 2);
+        scene.add(gridFloor);
+
+        const gridCeiling = gridFloor.clone();
+        gridCeiling.material = gridMat.clone();
+        gridCeiling.position.y = RING_RADIUS;
+        scene.add(gridCeiling);
+
+        // --- Particle field (thousands of floating particles) ---
+        const PARTICLE_COUNT = 3000;
+        const particleGeo = new THREE.BufferGeometry();
+        const particlePos = new Float32Array(PARTICLE_COUNT * 3);
+        const particleSizes = new Float32Array(PARTICLE_COUNT);
+        const TUNNEL_DEPTH = RING_COUNT * RING_SPACING;
+
+        for (let i = 0; i < PARTICLE_COUNT; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const radius = 2 + Math.random() * (RING_RADIUS - 3);
+            particlePos[i * 3]     = Math.cos(angle) * radius;
+            particlePos[i * 3 + 1] = Math.sin(angle) * radius;
+            particlePos[i * 3 + 2] = -Math.random() * TUNNEL_DEPTH;
+            particleSizes[i] = 0.5 + Math.random() * 2;
+        }
+        particleGeo.setAttribute('position', new THREE.BufferAttribute(particlePos, 3));
+
+        const particleMat = new THREE.PointsMaterial({
+            color: GREEN.clone(),
+            size: 0.6,
+            transparent: true,
+            opacity: 0.0,
+            sizeAttenuation: true,
+        });
+        const particles = new THREE.Points(particleGeo, particleMat);
+        scene.add(particles);
+
+        // --- Floating wireframe polyhedra ---
+        const polyhedra = [];
+        const polyGeos = [
+            new THREE.IcosahedronGeometry(1.2, 0),
+            new THREE.OctahedronGeometry(1.0, 0),
+            new THREE.TetrahedronGeometry(1.0, 0),
+            new THREE.DodecahedronGeometry(0.9, 0),
+        ];
+
+        for (let i = 0; i < 40; i++) {
+            const geo = polyGeos[Math.floor(Math.random() * polyGeos.length)];
+            const mat = new THREE.MeshBasicMaterial({
+                color: GREEN.clone(),
+                wireframe: true,
+                transparent: true,
+                opacity: 0.0,
+            });
+            const mesh = new THREE.Mesh(geo, mat);
+            const angle = Math.random() * Math.PI * 2;
+            const radius = 4 + Math.random() * (RING_RADIUS - 6);
+            mesh.position.set(
+                Math.cos(angle) * radius,
+                Math.sin(angle) * radius,
+                -(10 + Math.random() * (TUNNEL_DEPTH - 20))
+            );
+            const s = 0.5 + Math.random() * 2;
+            mesh.scale.set(s, s, s);
+            mesh.userData = {
+                rotX: (Math.random() - 0.5) * 2,
+                rotY: (Math.random() - 0.5) * 2,
+                rotZ: (Math.random() - 0.5) * 1,
+            };
+            scene.add(mesh);
+            polyhedra.push(mesh);
+        }
+
+        // --- Central light beam (cylinder along Z axis) ---
+        const beamGeo = new THREE.CylinderGeometry(0.08, 0.08, TUNNEL_DEPTH, 4);
+        const beamMat = new THREE.MeshBasicMaterial({
+            color: GREEN.clone(),
+            transparent: true,
+            opacity: 0.0,
+        });
+        const beam = new THREE.Mesh(beamGeo, beamMat);
+        beam.rotation.x = Math.PI / 2;
+        beam.position.z = -TUNNEL_DEPTH / 2;
+        scene.add(beam);
+
+        // --- Horizontal scan lines (flat planes that sweep through) ---
+        const scanLines = [];
+        for (let i = 0; i < 6; i++) {
+            const geo = new THREE.PlaneGeometry(RING_RADIUS * 2.5, 0.08);
+            const mat = new THREE.MeshBasicMaterial({
+                color: GREEN.clone(),
+                transparent: true,
+                opacity: 0.0,
+                side: THREE.DoubleSide,
+            });
+            const mesh = new THREE.Mesh(geo, mat);
+            mesh.position.set(0, -RING_RADIUS + (i * RING_RADIUS * 2 / 5), -30);
+            scene.add(mesh);
+            scanLines.push(mesh);
+        }
+
+        // --- Animation state ---
+        let phase = 'idle';  // 'idle' | 'warp' | 'done'
+        let warpStart = 0;
+        const WARP_DURATION = 4500;
+        let idleTime = 0;
+        let animId = null;
+
+        // --- Idle animation (subtle floating camera, dim particles) ---
+        function idleOpacity(t) {
+            // Gently fade in scene elements during idle
+            const fadeIn = Math.min(t / 2, 1);
+            const pulse = 0.15 + 0.05 * Math.sin(t * 0.8);
+
+            rings.forEach((r, i) => {
+                r.material.opacity = pulse * fadeIn * (i < 15 ? 1 : 0.3);
+                r.rotation.z += r.userData.rotSpeed * 0.003;
+            });
+            innerRings.forEach((r, i) => {
+                r.material.opacity = pulse * 0.5 * fadeIn * (i < 15 ? 1 : 0.2);
+                r.rotation.z += r.userData.rotSpeed * 0.003;
+            });
+
+            particleMat.opacity = 0.15 * fadeIn;
+
+            polyhedra.forEach(p => {
+                p.material.opacity = 0.12 * fadeIn;
+                p.rotation.x += p.userData.rotX * 0.003;
+                p.rotation.y += p.userData.rotY * 0.003;
+            });
+
+            gridMat.opacity = 0.04 * fadeIn;
+            gridCeiling.material.opacity = 0.04 * fadeIn;
+            beamMat.opacity = 0.06 * fadeIn;
+
+            // Gentle camera sway
+            camera.position.x = Math.sin(t * 0.3) * 0.5;
+            camera.position.y = Math.cos(t * 0.25) * 0.3;
+            camera.lookAt(0, 0, -30);
+        }
+
+        // --- Warp animation ---
+        function warpFrame(progress) {
+            // Easing: slow start, fast middle, slow end for cinematic feel
+            const eased = progress < 0.3
+                ? Math.pow(progress / 0.3, 2) * 0.3
+                : 0.3 + (1 - Math.pow(1 - (progress - 0.3) / 0.7, 3)) * 0.7;
+
+            const speed = 1 + 120 * Math.pow(eased, 2);
+            const camZ = -eased * TUNNEL_DEPTH * 0.95;
+
+            // Camera
+            camera.position.z = camZ;
+            camera.fov = 60 + 40 * Math.pow(eased, 2); // FOV widens for speed
+            camera.updateProjectionMatrix();
+
+            // Camera shake at high speed
+            if (eased > 0.4) {
+                const shakeAmt = (eased - 0.4) * 3;
+                camera.position.x = (Math.random() - 0.5) * shakeAmt;
+                camera.position.y = (Math.random() - 0.5) * shakeAmt;
+            }
+            camera.lookAt(camera.position.x * 0.5, camera.position.y * 0.5, camZ - 50);
+
+            // Ring animation
+            rings.forEach((r, i) => {
+                const dist = Math.abs(r.position.z - camZ);
+                const near = Math.max(0, 1 - dist / 80);
+
+                r.material.opacity = 0.1 + near * 0.9;
+                r.material.color.lerpColors(DARK_GREEN, GREEN, 0.3 + near * 0.7);
+                r.rotation.z += r.userData.rotSpeed * (0.01 + eased * 0.08);
+
+                // Rings scale up as camera approaches
+                const scalePulse = 1 + near * 0.3 * Math.sin(progress * 30 + i);
+                r.scale.set(scalePulse, scalePulse, 1);
+            });
+
+            innerRings.forEach((r, i) => {
+                const dist = Math.abs(r.position.z - camZ);
+                const near = Math.max(0, 1 - dist / 60);
+                r.material.opacity = 0.05 + near * 0.6;
+                r.rotation.z += r.userData.rotSpeed * (0.01 + eased * 0.1);
+            });
+
+            // Particles
+            particleMat.opacity = 0.3 + eased * 0.7;
+            particleMat.size = 0.6 + eased * 3; // Particles get bigger = closer
+
+            // Polyhedra
+            polyhedra.forEach(p => {
+                p.material.opacity = 0.15 + eased * 0.5;
+                p.rotation.x += p.userData.rotX * (0.01 + eased * 0.15);
+                p.rotation.y += p.userData.rotY * (0.01 + eased * 0.15);
+                p.rotation.z += (p.userData.rotZ || 0) * (0.01 + eased * 0.1);
+            });
+
+            // Grid
+            const gridOp = 0.06 + eased * 0.25;
+            gridMat.opacity = gridOp;
+            gridCeiling.material.opacity = gridOp;
+
+            // Beam
+            beamMat.opacity = 0.1 + eased * 0.5;
+
+            // Scan lines sweep
+            scanLines.forEach((sl, i) => {
+                sl.material.opacity = 0.1 + eased * 0.5;
+                sl.position.z = camZ - 20 - i * 5;
+                sl.position.y = -RING_RADIUS + ((i + progress * 10) % 6) * (RING_RADIUS * 2 / 5);
+            });
+
+            // Fog decreases (see further) then increases (whiteout)
+            if (eased < 0.7) {
+                scene.fog.density = 0.0025 - eased * 0.003;
+            } else {
+                scene.fog.density = 0.0025 + (eased - 0.7) * 0.02;
+            }
+
+            // Green tint intensifies
+            if (eased > 0.5) {
+                const tint = (eased - 0.5) * 2;
+                renderer.setClearColor(new THREE.Color().lerpColors(
+                    new THREE.Color(0x000000),
+                    new THREE.Color(0x001a00),
+                    tint
+                ));
+            }
+
+            // Final flash
+            if (eased > 0.85) {
+                const flash = Math.pow((eased - 0.85) / 0.15, 2);
+                renderer.setClearColor(new THREE.Color().lerpColors(
+                    new THREE.Color(0x001a00),
+                    new THREE.Color(0x0a0a0a),
+                    flash
+                ));
+            }
+        }
+
+        // --- Sound ---
+        function playWarpSound() {
+            if (!audioCtx) return;
+            const ctx = audioCtx;
+            const t = ctx.currentTime;
+            const dur = WARP_DURATION / 1000;
+
+            // Deep bass drone
+            const osc = ctx.createOscillator();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(40, t);
+            osc.frequency.exponentialRampToValueAtTime(200, t + dur);
+            const oscGain = ctx.createGain();
+            oscGain.gain.setValueAtTime(0.0, t);
+            oscGain.gain.linearRampToValueAtTime(0.08, t + dur * 0.3);
+            oscGain.gain.linearRampToValueAtTime(0.12, t + dur * 0.7);
+            oscGain.gain.linearRampToValueAtTime(0.0, t + dur);
+            osc.connect(oscGain);
+            oscGain.connect(ctx.destination);
+            osc.start(t);
+            osc.stop(t + dur);
+
+            // Rising noise whoosh
+            const bufLen = Math.floor(ctx.sampleRate * dur);
+            const buf = ctx.createBuffer(1, bufLen, ctx.sampleRate);
+            const data = buf.getChannelData(0);
+            for (let i = 0; i < bufLen; i++) data[i] = Math.random() * 2 - 1;
+            const noise = ctx.createBufferSource();
+            noise.buffer = buf;
+            const filter = ctx.createBiquadFilter();
+            filter.type = 'bandpass';
+            filter.frequency.setValueAtTime(100, t);
+            filter.frequency.exponentialRampToValueAtTime(6000, t + dur);
+            filter.Q.value = 0.3;
+            const nGain = ctx.createGain();
+            nGain.gain.setValueAtTime(0.0, t);
+            nGain.gain.linearRampToValueAtTime(0.15, t + dur * 0.5);
+            nGain.gain.linearRampToValueAtTime(0.0, t + dur);
+            noise.connect(filter);
+            filter.connect(nGain);
+            nGain.connect(ctx.destination);
+            noise.start(t);
+            noise.stop(t + dur);
+
+            // High-pitched whine
+            const osc2 = ctx.createOscillator();
+            osc2.type = 'sine';
+            osc2.frequency.setValueAtTime(800, t);
+            osc2.frequency.exponentialRampToValueAtTime(4000, t + dur);
+            const o2Gain = ctx.createGain();
+            o2Gain.gain.setValueAtTime(0.0, t);
+            o2Gain.gain.linearRampToValueAtTime(0.03, t + dur * 0.5);
+            o2Gain.gain.linearRampToValueAtTime(0.0, t + dur);
+            osc2.connect(o2Gain);
+            o2Gain.connect(ctx.destination);
+            osc2.start(t);
+            osc2.stop(t + dur);
+        }
+
+        // --- Main render loop ---
+        function animate(now) {
+            animId = requestAnimationFrame(animate);
+            const t = now / 1000;
+
+            if (phase === 'idle') {
+                idleTime = t;
+                idleOpacity(t);
+            } else if (phase === 'warp') {
+                const elapsed = now - warpStart;
+                const progress = Math.min(elapsed / WARP_DURATION, 1);
+
+                warpFrame(progress);
+
+                // Hide title and hint
+                if (progress > 0.02) {
+                    introTitle.classList.add('hide');
+                    document.getElementById('introHint').classList.add('hide');
+                }
+
+                // Trigger fadeout near end
+                if (progress > 0.82 && !fadeout.classList.contains('active')) {
+                    fadeout.classList.add('active');
+                }
+
+                if (progress >= 1) {
+                    phase = 'done';
+                    cancelAnimationFrame(animId);
+                    renderer.dispose();
+                    container.style.display = 'none';
+                    setTimeout(() => {
+                        fadeout.style.transition = 'opacity 0.6s ease';
+                        fadeout.style.opacity = '0';
+                        setTimeout(() => { fadeout.style.display = 'none'; }, 600);
+                        boot();
+                    }, 300);
+                }
+            }
+
+            if (phase !== 'done') {
+                renderer.render(scene, camera);
+            }
+        }
+
+        // --- Start ---
+        animate(performance.now());
+
+        // --- Click to launch warp ---
+        function onIntroClick() {
+            if (phase !== 'idle') return;
+            container.removeEventListener('click', onIntroClick);
+            container.removeEventListener('touchstart', onIntroClick);
+
+            initAudio();
+            playWarpSound();
+
+            phase = 'warp';
+            warpStart = performance.now();
+        }
+
+        container.addEventListener('click', onIntroClick);
+        container.addEventListener('touchstart', onIntroClick, { passive: true });
+
+        // --- Resize ---
+        window.addEventListener('resize', () => {
+            if (phase === 'done') return;
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    })();
 
     // ===== FORM HANDLING =====
     const GOOGLE_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSeUitUmMJc55uMaEtBLHF1H1LOcRME3DTVtTG1iI3Gdjpcb6w/formResponse';
