@@ -21,6 +21,7 @@
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
 
     <!-- Three.js -->
+    <button class="music-toggle" id="musicToggle">♪ MUSIC: OFF</button>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <style>
@@ -385,6 +386,29 @@
             transition: opacity 0.08s linear;
         }
 
+        /* ===== MUSIC TOGGLE ===== */
+        .music-toggle {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 100;
+            font-family: 'VT323', monospace;
+            font-size: 1.05rem;
+            color: #00FF41;
+            background: rgba(0,0,0,0.6);
+            border: 1.5px solid rgba(0,255,65,0.3);
+            padding: 6px 12px;
+            cursor: pointer;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            transition: opacity 0.15s, background 0.15s;
+            display: none;
+        }
+
+        .music-toggle:hover {
+            background: rgba(0,255,65,0.1);
+        }
+
         /* ===== RESPONSIVE ===== */
         @media (max-width: 640px) {
             .page { padding: 36px 24px; }
@@ -484,6 +508,8 @@
     <!-- ===== FAQ ===== -->
     <div class="page" id="faqPage">
         <div class="page-top">
+            <button class="back-link" id="backFromFaq">[ESC] BACK</button>
+            <div style="height: 32px"></div>
             <div id="faqAccordion">
                 <div class="faq-item active-item" data-faq="0">
                     <div class="faq-question">&gt; [+] What is Debut?</div>
@@ -521,8 +547,6 @@
                 </div>
             </div>
 
-            <div style="height: 32px"></div>
-            <button class="back-link" id="backFromFaq">[ back ]</button>
         </div>
         <div class="page-footer">
             any doubts? <a href="https://www.linkedin.com/in/davide-miron-8826a0257/" target="_blank">let's chat</a>
@@ -551,12 +575,12 @@
 
         const s1 = ctx.createBufferSource(); s1.buffer = noiseBuffer;
         const f1 = ctx.createBiquadFilter(); f1.type = 'lowpass'; f1.frequency.value = 600 * p; f1.Q.value = 0.7;
-        const g1 = ctx.createGain(); g1.gain.setValueAtTime(0.12, t); g1.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
+        const g1 = ctx.createGain(); g1.gain.setValueAtTime(0.22, t); g1.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
         s1.connect(f1); f1.connect(g1); g1.connect(ctx.destination); s1.start(t); s1.stop(t + 0.05);
 
         const s2 = ctx.createBufferSource(); s2.buffer = noiseBuffer;
         const f2 = ctx.createBiquadFilter(); f2.type = 'bandpass'; f2.frequency.value = 4000 * p; f2.Q.value = 2;
-        const g2 = ctx.createGain(); g2.gain.setValueAtTime(0.06, t); g2.gain.exponentialRampToValueAtTime(0.001, t + 0.018);
+        const g2 = ctx.createGain(); g2.gain.setValueAtTime(0.10, t); g2.gain.exponentialRampToValueAtTime(0.001, t + 0.018);
         s2.connect(f2); f2.connect(g2); g2.connect(ctx.destination); s2.start(t); s2.stop(t + 0.02);
     }
 
@@ -587,7 +611,7 @@
                 const sp = document.createElement('div');
                 sp.className = 'spacer';
                 container.appendChild(sp);
-                setTimeout(nextLine, 80);
+                setTimeout(nextLine, 60);
                 return;
             }
 
@@ -603,11 +627,11 @@
                 a.id = cfg.menuId || '';
                 el.appendChild(a);
                 typeChars(a, cfg.text, 0, () => {
-                    setTimeout(nextLine, cfg.pause || 120);
+                    setTimeout(nextLine, cfg.pause || 90);
                 });
             } else {
                 typeChars(el, cfg.text, 0, () => {
-                    setTimeout(nextLine, cfg.pause || 120);
+                    setTimeout(nextLine, cfg.pause || 90);
                 });
             }
         }
@@ -617,9 +641,9 @@
             el.textContent += text[idx];
             typeSound();
             const ch = text[idx];
-            let delay = 35 + Math.random() * 25;
-            if (ch === ' ') delay = 20 + Math.random() * 15;
-            if (ch === '.' || ch === '—' || ch === ',') delay = 80 + Math.random() * 40;
+            let delay = 20 + Math.random() * 15;
+            if (ch === ' ') delay = 12 + Math.random() * 8;
+            if (ch === '.' || ch === '—' || ch === ',') delay = 42 + Math.random() * 25;
             setTimeout(() => typeChars(el, text, idx + 1, done), delay);
         }
 
@@ -632,11 +656,11 @@
         { type: 'spacer' },
         { text: 'WAITLIST OPEN NOW' },
         { type: 'spacer' },
-        { text: '[1] APPLY', menu: true, boxed: true, menuId: 'menuApply', pause: 200 },
+        { text: '[1] APPLY', menu: true, boxed: true, menuId: 'menuApply', pause: 80 },
         { type: 'spacer' },
-        { text: '[2] MANIFESTO', menu: true, menuId: 'menuManifesto', pause: 200 },
+        { text: '[2] MANIFESTO', menu: true, menuId: 'menuManifesto', pause: 80 },
         { type: 'spacer' },
-        { text: '[3] FAQ', menu: true, menuId: 'menuFaq', pause: 200 },
+        { text: '[3] FAQ', menu: true, menuId: 'menuFaq', pause: 80 },
     ];
 
     const applyLines = [
@@ -659,7 +683,6 @@
     document.getElementById('faqAccordion').addEventListener('click', (e) => {
         const item = e.target.closest('.faq-item');
         if (!item) return;
-        typeSound();
         const wasActive = item.classList.contains('active-item');
         document.querySelectorAll('.faq-item').forEach(el => el.classList.remove('active-item'));
         if (!wasActive) item.classList.add('active-item');
@@ -673,26 +696,78 @@
         faq: document.getElementById('faqPage'),
     };
 
+    const visitedPages = {};
+
+    function renderInstant(container, lines, onDone) {
+        container.innerHTML = '';
+        lines.forEach(cfg => {
+            if (cfg.type === 'spacer') {
+                const sp = document.createElement('div');
+                sp.className = 'spacer';
+                container.appendChild(sp);
+                return;
+            }
+            const el = document.createElement('div');
+            el.className = 'line' + (cfg.body ? ' line-body' : '');
+            if (cfg.cls) el.className += ' ' + cfg.cls;
+            if (cfg.id) el.id = cfg.id;
+            if (cfg.menu) {
+                const a = document.createElement('span');
+                a.className = 'menu-item' + (cfg.boxed ? ' boxed' : '');
+                a.id = cfg.menuId || '';
+                a.textContent = cfg.text;
+                el.appendChild(a);
+            } else {
+                el.textContent = cfg.text;
+            }
+            container.appendChild(el);
+        });
+        const cursorEl = document.createElement('span');
+        cursorEl.className = 'cursor';
+        container.appendChild(cursorEl);
+        if (onDone) onDone();
+    }
+
     function showPage(name) {
         Object.values(pages).forEach(p => p.classList.remove('active'));
         pages[name].classList.add('active');
         window.scrollTo(0, 0);
 
         if (name === 'home') {
-            typewrite(document.getElementById('homeContent'), homeLines, () => {
-                document.getElementById('homeFooter').style.opacity = '1';
-                bindMenuClicks();
-            });
+            if (visitedPages.home) {
+                renderInstant(document.getElementById('homeContent'), homeLines, () => {
+                    document.getElementById('homeFooter').style.opacity = '1';
+                    bindMenuClicks();
+                });
+            } else {
+                typewrite(document.getElementById('homeContent'), homeLines, () => {
+                    document.getElementById('homeFooter').style.opacity = '1';
+                    bindMenuClicks();
+                });
+            }
+            visitedPages.home = true;
         } else if (name === 'apply') {
             const form = document.getElementById('waitlistForm');
             form.style.display = 'none';
             document.getElementById('successState').classList.remove('active');
             document.getElementById('errorMsg').classList.remove('active');
-            typewrite(document.getElementById('applyContent'), applyLines, () => {
-                form.style.display = 'block';
-            });
+            if (visitedPages.apply) {
+                renderInstant(document.getElementById('applyContent'), applyLines, () => {
+                    form.style.display = 'block';
+                });
+            } else {
+                typewrite(document.getElementById('applyContent'), applyLines, () => {
+                    form.style.display = 'block';
+                });
+            }
+            visitedPages.apply = true;
         } else if (name === 'manifesto') {
-            typewrite(document.getElementById('manifestoContent'), manifestoLines);
+            if (visitedPages.manifesto) {
+                renderInstant(document.getElementById('manifestoContent'), manifestoLines);
+            } else {
+                typewrite(document.getElementById('manifestoContent'), manifestoLines);
+            }
+            visitedPages.manifesto = true;
         } else if (name === 'faq') {
             document.querySelectorAll('.faq-item').forEach((el, i) => {
                 el.classList.toggle('active-item', i === 0);
@@ -722,7 +797,6 @@
             if (i === selectedMenu) el.classList.add('boxed');
             else el.classList.remove('boxed');
         });
-        typeSound();
     }
 
     document.addEventListener('keydown', (e) => {
@@ -760,21 +834,21 @@
                 faqItems.forEach(el => el.classList.remove('active-item'));
                 faqItems[next].classList.add('active-item');
                 faqItems[next].scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-                typeSound();
+    
             } else if (e.key === 'ArrowUp' || e.key === 'k') {
                 e.preventDefault();
                 const prev = (activeIdx - 1 + faqItems.length) % faqItems.length;
                 faqItems.forEach(el => el.classList.remove('active-item'));
                 faqItems[prev].classList.add('active-item');
                 faqItems[prev].scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-                typeSound();
+    
             }
         }
     });
 
     // ===== BOOT =====
     function boot() {
-        initAudio();
+
         showPage('home');
     }
 
@@ -1094,113 +1168,127 @@
         screenMesh.position.set(0, 1.26, -0.188);
         scene.add(screenMesh);
 
-        // The monitor shows the ACTUAL homepage content — so the
-        // transition from 3D intro → real terminal is seamless.
-        var screenTyped = '';
-        var screenLines = [
-            { text: 'DEBUT / COMING SOON TO IOS & ANDROID', bold: true, delay: 45 },
-            { text: '', delay: 0 },
-            { text: 'WAITLIST OPEN NOW', bold: true, delay: 45 },
-            { text: '', delay: 0 },
-            { text: '[1] APPLY', bold: true, boxed: true, delay: 55 },
-            { text: '', delay: 0 },
-            { text: '[2] MANIFESTO', bold: false, delay: 50 },
-            { text: '', delay: 0 },
-            { text: '[3] FAQ', bold: false, delay: 50 },
-        ];
-        var scrLineIdx = 0;
-        var scrCharIdx = 0;
-        var lastScrTick = 0;
-        var scrDoneTyping = false;
-        // Collect fully typed lines for rendering
-        var scrFinished = [];
+        // Growing graph on main monitor
+        var graphStartTime = performance.now();
+        // Generate graph data points — exponential growth curve with noise
+        var graphPoints = [];
+        var GRAPH_TOTAL = 80;
+        for (var gi = 0; gi < GRAPH_TOTAL; gi++) {
+            var base = Math.pow(gi / GRAPH_TOTAL, 2.2);
+            var noise = (Math.random() - 0.5) * 0.06;
+            graphPoints.push(Math.max(0, Math.min(1, base + noise)));
+        }
 
         function renderScreen(time) {
             var W = 640, H = 420;
-            var PAD_X = 48, PAD_Y = 50;
-            var LINE_H = 30;
+            var PAD_L = 55, PAD_R = 30, PAD_T = 55, PAD_B = 50;
+            var graphW = W - PAD_L - PAD_R;
+            var graphH = H - PAD_T - PAD_B;
 
-            // Advance typewriter
-            if (!scrDoneTyping && scrLineIdx < screenLines.length) {
-                var entry = screenLines[scrLineIdx];
-                var charDelay = entry.delay || 40;
-                if (entry.text.length === 0) {
-                    // Empty line = spacer, advance immediately
-                    scrFinished.push(entry);
-                    scrLineIdx++;
-                    scrCharIdx = 0;
-                } else if (time - lastScrTick > charDelay) {
-                    lastScrTick = time;
-                    scrCharIdx++;
-                    if (scrCharIdx > entry.text.length) {
-                        scrFinished.push(entry);
-                        scrLineIdx++;
-                        scrCharIdx = 0;
-                    }
-                }
-            }
-            if (scrLineIdx >= screenLines.length) scrDoneTyping = true;
+            // How many points to reveal (grows over ~8 seconds)
+            var elapsed = (time - graphStartTime) / 1000;
+            var reveal = Math.min(GRAPH_TOTAL, Math.floor(elapsed * 30));
 
-            // ---- Draw the screen ----
             // Background
             sCtx.fillStyle = '#0a0a0a';
             sCtx.fillRect(0, 0, W, H);
 
-            var y = PAD_Y;
+            // Title
+            sCtx.font = 'bold 15px monospace';
+            sCtx.fillStyle = '#00FF41';
+            sCtx.textBaseline = 'top';
+            sCtx.fillText('DEBUT — GROWTH', PAD_L, 18);
 
-            // Draw finished lines
-            for (var i = 0; i < scrFinished.length; i++) {
-                var ln = scrFinished[i];
-                if (ln.text.length === 0) { y += 16; continue; }
+            // Axis lines
+            sCtx.strokeStyle = 'rgba(0,255,65,0.25)';
+            sCtx.lineWidth = 1;
+            sCtx.beginPath();
+            sCtx.moveTo(PAD_L, PAD_T);
+            sCtx.lineTo(PAD_L, PAD_T + graphH);
+            sCtx.lineTo(PAD_L + graphW, PAD_T + graphH);
+            sCtx.stroke();
 
-                sCtx.font = (ln.bold ? 'bold ' : '') + '16px monospace';
+            // Grid lines
+            sCtx.strokeStyle = 'rgba(0,255,65,0.07)';
+            for (var gy = 0; gy < 5; gy++) {
+                var yy = PAD_T + graphH * (gy / 4);
+                sCtx.beginPath();
+                sCtx.moveTo(PAD_L, yy);
+                sCtx.lineTo(PAD_L + graphW, yy);
+                sCtx.stroke();
+            }
+
+            // Draw filled area under curve
+            if (reveal > 1) {
+                sCtx.beginPath();
+                sCtx.moveTo(PAD_L, PAD_T + graphH);
+                for (var pi = 0; pi < reveal; pi++) {
+                    var px = PAD_L + (pi / (GRAPH_TOTAL - 1)) * graphW;
+                    var py = PAD_T + graphH - graphPoints[pi] * graphH;
+                    if (pi === 0) sCtx.lineTo(px, py);
+                    else sCtx.lineTo(px, py);
+                }
+                var lastX = PAD_L + ((reveal - 1) / (GRAPH_TOTAL - 1)) * graphW;
+                sCtx.lineTo(lastX, PAD_T + graphH);
+                sCtx.closePath();
+                var areaGrad = sCtx.createLinearGradient(0, PAD_T, 0, PAD_T + graphH);
+                areaGrad.addColorStop(0, 'rgba(0,255,65,0.15)');
+                areaGrad.addColorStop(1, 'rgba(0,255,65,0.02)');
+                sCtx.fillStyle = areaGrad;
+                sCtx.fill();
+
+                // Draw the line
+                sCtx.beginPath();
+                for (var pi2 = 0; pi2 < reveal; pi2++) {
+                    var lx = PAD_L + (pi2 / (GRAPH_TOTAL - 1)) * graphW;
+                    var ly = PAD_T + graphH - graphPoints[pi2] * graphH;
+                    if (pi2 === 0) sCtx.moveTo(lx, ly);
+                    else sCtx.lineTo(lx, ly);
+                }
+                sCtx.strokeStyle = '#00FF41';
+                sCtx.lineWidth = 2.5;
+                sCtx.shadowColor = '#00FF41';
+                sCtx.shadowBlur = 8;
+                sCtx.stroke();
+                sCtx.shadowBlur = 0;
+
+                // Glowing dot at the tip
+                var tipX = PAD_L + ((reveal - 1) / (GRAPH_TOTAL - 1)) * graphW;
+                var tipY = PAD_T + graphH - graphPoints[reveal - 1] * graphH;
+                sCtx.beginPath();
+                sCtx.arc(tipX, tipY, 4, 0, Math.PI * 2);
                 sCtx.fillStyle = '#00FF41';
-                sCtx.textBaseline = 'top';
+                sCtx.shadowColor = '#00FF41';
+                sCtx.shadowBlur = 12;
+                sCtx.fill();
+                sCtx.shadowBlur = 0;
 
-                if (ln.boxed) {
-                    // Draw box around the text like the real [1] APPLY button
-                    var tw = sCtx.measureText(ln.text).width;
-                    sCtx.strokeStyle = 'rgba(0,255,65,0.8)';
-                    sCtx.lineWidth = 1.5;
-                    sCtx.strokeRect(PAD_X - 8, y - 4, tw + 16, LINE_H - 4);
-                }
-
-                sCtx.fillText(ln.text, PAD_X, y);
-                y += LINE_H;
-            }
-
-            // Draw currently typing line
-            if (!scrDoneTyping && scrLineIdx < screenLines.length) {
-                var cur = screenLines[scrLineIdx];
-                if (cur.text.length > 0) {
-                    var partial = cur.text.substring(0, scrCharIdx);
-                    sCtx.font = (cur.bold ? 'bold ' : '') + '16px monospace';
-                    sCtx.fillStyle = '#00FF41';
-                    sCtx.textBaseline = 'top';
-                    sCtx.fillText(partial, PAD_X, y);
-                }
-            }
-
-            // Blinking cursor at end of last visible text
-            if (Math.floor(time / 530) % 2 === 0) {
-                var cursorY = y;
-                var cursorX = PAD_X;
-                if (!scrDoneTyping && scrLineIdx < screenLines.length && screenLines[scrLineIdx].text.length > 0) {
-                    var p = screenLines[scrLineIdx].text.substring(0, scrCharIdx);
-                    cursorX = PAD_X + sCtx.measureText(p).width;
-                } else if (scrDoneTyping) {
-                    // Cursor on a new line after all content
-                    cursorY = y + 20;
-                }
+                // Value label at tip
+                var pct = Math.round(graphPoints[reveal - 1] * 100);
+                sCtx.font = 'bold 13px monospace';
                 sCtx.fillStyle = '#00FF41';
-                sCtx.fillRect(cursorX, cursorY, 9, 17);
+                sCtx.fillText(pct + '%', tipX + 8, tipY - 6);
             }
 
-            // Footer text at bottom
-            if (scrDoneTyping) {
-                sCtx.font = '13px monospace';
-                sCtx.fillStyle = 'rgba(0,255,65,0.35)';
-                sCtx.fillText('any doubts? let\'s chat', PAD_X, H - 30);
+            // Y-axis labels
+            sCtx.font = '11px monospace';
+            sCtx.fillStyle = 'rgba(0,255,65,0.4)';
+            sCtx.textAlign = 'right';
+            sCtx.textBaseline = 'middle';
+            for (var yl = 0; yl <= 4; yl++) {
+                sCtx.fillText((yl * 25) + '%', PAD_L - 8, PAD_T + graphH - (yl / 4) * graphH);
+            }
+            sCtx.textAlign = 'left';
+
+            // X-axis label
+            sCtx.font = '11px monospace';
+            sCtx.fillStyle = 'rgba(0,255,65,0.35)';
+            sCtx.textBaseline = 'top';
+            sCtx.fillText('TIME', PAD_L + graphW - 25, PAD_T + graphH + 12);
+
+            // Restart the graph when it finishes
+            if (reveal >= GRAPH_TOTAL && elapsed > (GRAPH_TOTAL / 30) + 2) {
+                graphStartTime = time;
             }
 
             // CRT scanlines
@@ -2003,19 +2091,8 @@
         var _idleAngle = Math.PI * 0.5;
 
         function idleCameraUpdate(t) {
-            var BASE_RADIUS = 7.5;
-            var ANGULAR_VEL = (2 * Math.PI) / 28; // one orbit per 28s
-
-            var radius = BASE_RADIUS + Math.sin(t * (2 * Math.PI / 18)) * 0.5;
-            var height = 1.0 + 2.3 + Math.sin(t * (2 * Math.PI / 14)) * 0.2;
-            var angle = t * ANGULAR_VEL;
-            _idleAngle = angle;
-
-            camera.position.set(
-                Math.cos(angle) * radius,
-                height,
-                0.5 + Math.sin(angle) * radius
-            );
+            // Static camera — slight angle from the right
+            camera.position.set(2.8, 2.4, 5.2);
             camera.lookAt(0, 1.1, 0);
         }
 
@@ -2287,84 +2364,6 @@
         }
 
         // ============================================================
-        //  SOUND DESIGN (warm ambient pad)
-        // ============================================================
-        function playWarpSound() {
-            if (!audioCtx) return;
-            var ctx = audioCtx;
-            var t = ctx.currentTime;
-            var dur = WARP_DURATION / 1000;
-
-            var pad1 = ctx.createOscillator();
-            pad1.type = 'sine';
-            pad1.frequency.setValueAtTime(130.8, t);
-            pad1.frequency.linearRampToValueAtTime(146.8, t + dur);
-            var gp1 = ctx.createGain();
-            gp1.gain.setValueAtTime(0, t);
-            gp1.gain.linearRampToValueAtTime(0.06, t + dur * 0.25);
-            gp1.gain.linearRampToValueAtTime(0.07, t + dur * 0.7);
-            gp1.gain.linearRampToValueAtTime(0, t + dur);
-            pad1.connect(gp1); gp1.connect(ctx.destination);
-            pad1.start(t); pad1.stop(t + dur);
-
-            var pad2 = ctx.createOscillator();
-            pad2.type = 'sine';
-            pad2.frequency.setValueAtTime(196.0, t);
-            pad2.frequency.linearRampToValueAtTime(207.7, t + dur);
-            var gp2 = ctx.createGain();
-            gp2.gain.setValueAtTime(0, t);
-            gp2.gain.linearRampToValueAtTime(0.045, t + dur * 0.3);
-            gp2.gain.linearRampToValueAtTime(0.05, t + dur * 0.7);
-            gp2.gain.linearRampToValueAtTime(0, t + dur);
-            pad2.connect(gp2); gp2.connect(ctx.destination);
-            pad2.start(t); pad2.stop(t + dur);
-
-            var pad3 = ctx.createOscillator();
-            pad3.type = 'sine';
-            pad3.frequency.setValueAtTime(329.6, t);
-            pad3.frequency.linearRampToValueAtTime(349.2, t + dur);
-            var gp3 = ctx.createGain();
-            gp3.gain.setValueAtTime(0, t);
-            gp3.gain.linearRampToValueAtTime(0.03, t + dur * 0.35);
-            gp3.gain.linearRampToValueAtTime(0.035, t + dur * 0.7);
-            gp3.gain.linearRampToValueAtTime(0, t + dur);
-            pad3.connect(gp3); gp3.connect(ctx.destination);
-            pad3.start(t); pad3.stop(t + dur);
-
-            var bufLen = Math.floor(ctx.sampleRate * dur);
-            var buf = ctx.createBuffer(1, bufLen, ctx.sampleRate);
-            var data = buf.getChannelData(0);
-            for (var i = 0; i < bufLen; i++) data[i] = Math.random() * 2 - 1;
-            var noise = ctx.createBufferSource();
-            noise.buffer = buf;
-            var lpf = ctx.createBiquadFilter();
-            lpf.type = 'lowpass';
-            lpf.frequency.setValueAtTime(400, t);
-            lpf.frequency.linearRampToValueAtTime(800, t + dur * 0.6);
-            lpf.frequency.linearRampToValueAtTime(300, t + dur);
-            lpf.Q.value = 0.5;
-            var gn = ctx.createGain();
-            gn.gain.setValueAtTime(0, t);
-            gn.gain.linearRampToValueAtTime(0.04, t + dur * 0.3);
-            gn.gain.linearRampToValueAtTime(0.05, t + dur * 0.6);
-            gn.gain.linearRampToValueAtTime(0, t + dur);
-            noise.connect(lpf); lpf.connect(gn); gn.connect(ctx.destination);
-            noise.start(t); noise.stop(t + dur);
-
-            var shimmer = ctx.createOscillator();
-            shimmer.type = 'sine';
-            shimmer.frequency.setValueAtTime(1318, t);
-            shimmer.frequency.linearRampToValueAtTime(1568, t + dur);
-            var gs = ctx.createGain();
-            gs.gain.setValueAtTime(0, t);
-            gs.gain.linearRampToValueAtTime(0.008, t + dur * 0.4);
-            gs.gain.linearRampToValueAtTime(0.012, t + dur * 0.75);
-            gs.gain.linearRampToValueAtTime(0, t + dur);
-            shimmer.connect(gs); gs.connect(ctx.destination);
-            shimmer.start(t); shimmer.stop(t + dur);
-        }
-
-        // ============================================================
         //  MAIN RENDER LOOP
         // ============================================================
         function animate(now) {
@@ -2400,7 +2399,7 @@
             container.removeEventListener('touchstart', onIntroClick);
 
             initAudio();
-            playWarpSound();
+            fadeInMusic();
 
             // Capture current camera position from orbit
             var startPos = camera.position.clone();
@@ -2499,6 +2498,52 @@
             errorMsg.classList.add('active');
             btn.disabled = false;
             btn.textContent = '[ SUBMIT ]';
+        }
+    });
+
+    // ===== BACKGROUND MUSIC =====
+    var bgMusic = new Audio('bg-music.mp3');
+    bgMusic.loop = true;
+    bgMusic.volume = 0;
+
+    var musicBtn = document.getElementById('musicToggle');
+    var musicPlaying = false;
+    var musicFadeInterval = null;
+
+    function fadeInMusic() {
+        bgMusic.currentTime = 15;
+        bgMusic.volume = 0;
+        bgMusic.play().then(function() {
+            musicPlaying = true;
+            musicBtn.style.display = 'block';
+            musicBtn.textContent = '♪ MUSIC: ON';
+            var vol = 0;
+            clearInterval(musicFadeInterval);
+            musicFadeInterval = setInterval(function() {
+                vol += 0.02;
+                if (vol >= 0.15) {
+                    vol = 0.15;
+                    clearInterval(musicFadeInterval);
+                }
+                bgMusic.volume = vol;
+            }, 40);
+        }).catch(function() {
+            musicBtn.style.display = 'block';
+            musicBtn.textContent = '♪ MUSIC: OFF';
+        });
+    }
+
+    musicBtn.addEventListener('click', function() {
+        if (musicPlaying) {
+            bgMusic.pause();
+            musicPlaying = false;
+            musicBtn.textContent = '♪ MUSIC: OFF';
+        } else {
+            bgMusic.currentTime = bgMusic.currentTime || 15;
+            bgMusic.volume = 0.15;
+            bgMusic.play();
+            musicPlaying = true;
+            musicBtn.textContent = '♪ MUSIC: ON';
         }
     });
     </script>
