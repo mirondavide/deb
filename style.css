@@ -1,0 +1,392 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'VT323', monospace;
+    background: #0a0a0a;
+    color: #00FF41;
+    min-height: 100vh;
+    overflow-x: hidden;
+    cursor: default;
+}
+
+::selection {
+    background: #00FF41;
+    color: #0a0a0a;
+}
+
+/* ===== PAGES ===== */
+.page {
+    display: none;
+    min-height: 100vh;
+    padding: 64px;
+    position: relative;
+}
+
+.page.active {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.page-top { flex: 1; }
+
+/* ===== TYPOGRAPHY ===== */
+.line {
+    font-size: 1.2rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    line-height: 1.6;
+    margin-bottom: 4px;
+    white-space: pre-wrap;
+    min-height: 1.6em;
+}
+
+.line-body {
+    font-weight: 400;
+    text-transform: lowercase;
+    letter-spacing: 0.02em;
+    line-height: 1.8;
+}
+
+.spacer { height: 20px; }
+
+/* Cursor */
+.cursor {
+    display: inline-block;
+    width: 0.55em;
+    height: 1.1em;
+    background: #00FF41;
+    vertical-align: text-bottom;
+    animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+/* ===== MENU ITEMS ===== */
+.menu-item {
+    display: inline-block;
+    cursor: pointer;
+    text-decoration: none;
+    color: #00FF41;
+    transition: opacity 0.15s;
+}
+
+.menu-item:hover { opacity: 0.55; }
+
+.menu-item.boxed {
+    border: 1.5px solid #00FF41;
+    padding: 4px 10px;
+    margin-left: -12px;
+}
+
+.menu-item.boxed:hover {
+    background: rgba(0,255,65,0.1);
+    opacity: 1;
+}
+
+/* ===== FOOTER ===== */
+.page-footer {
+    font-size: 1.2rem;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+    text-transform: lowercase;
+}
+
+.page-footer a {
+    color: #00FF41;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(0,255,65,0.4);
+    transition: opacity 0.15s;
+}
+
+.page-footer a:hover { opacity: 0.55; }
+
+/* ===== FORM ===== */
+.form-group {
+    margin-bottom: 18px;
+    max-width: 420px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 1.05rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+}
+
+.form-group label .opt {
+    opacity: 0.4;
+    font-weight: 400;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 8px 0;
+    background: transparent;
+    border: none;
+    border-bottom: 1.5px solid rgba(0,255,65,0.35);
+    color: #00FF41;
+    font-family: 'VT323', monospace;
+    font-size: 1.15rem;
+    outline: none;
+    border-radius: 0;
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-bottom-color: #00FF41;
+}
+
+.form-group input::placeholder {
+    color: rgba(0,255,65,0.25);
+    font-family: 'VT323', monospace;
+}
+
+.form-group select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 12 12'%3E%3Cpath fill='%23FFFFFF' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0 center;
+    padding-right: 20px;
+    cursor: pointer;
+}
+
+.form-group select option {
+    background: #0a0a0a;
+    color: #00FF41;
+}
+
+.submit-btn {
+    font-family: 'VT323', monospace;
+    font-size: 1.15rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 6px 14px;
+    background: transparent;
+    color: #00FF41;
+    border: 1.5px solid #00FF41;
+    cursor: pointer;
+    margin-top: 4px;
+    transition: background 0.15s;
+}
+
+.submit-btn:hover:not(:disabled) {
+    background: rgba(0,255,65,0.1);
+}
+
+.submit-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.form-note {
+    font-size: 0.95rem;
+    opacity: 0.4;
+    margin-top: 14px;
+    text-transform: lowercase;
+}
+
+.error-msg {
+    display: none;
+    font-size: 1.05rem;
+    padding: 6px 10px;
+    border: 1.5px solid #00FF41;
+    margin-bottom: 14px;
+    max-width: 420px;
+    text-transform: lowercase;
+}
+
+.error-msg.active { display: block; }
+
+.success-block { display: none; }
+.success-block.active { display: block; }
+
+/* ===== FAQ ACCORDION ===== */
+.faq-item {
+    margin-bottom: 16px;
+    cursor: pointer;
+    transition: opacity 0.15s;
+}
+
+.faq-item:hover { opacity: 0.7; }
+
+.faq-item.active-item { opacity: 1; }
+
+.faq-question {
+    font-size: 1.2rem;
+    font-weight: 700;
+    text-transform: none;
+    letter-spacing: 0.04em;
+    line-height: 1.6;
+    padding: 6px 0;
+}
+
+.faq-item.active-item .faq-question {
+    border: 1.5px solid #00FF41;
+    padding: 6px 12px;
+    margin-left: -14px;
+    background: rgba(0,255,65,0.05);
+}
+
+.faq-answer {
+    display: none;
+    font-size: 1.15rem;
+    font-weight: 400;
+    line-height: 1.8;
+    letter-spacing: 0.02em;
+    padding: 10px 0 6px 24px;
+    opacity: 0.7;
+}
+
+.faq-item.active-item .faq-answer {
+    display: block;
+}
+
+/* ===== BACK LINK ===== */
+.back-link {
+    font-family: 'VT323', monospace;
+    font-size: 1.15rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #00FF41;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    margin-bottom: 32px;
+    display: inline-block;
+    transition: opacity 0.15s;
+}
+
+.back-link:hover { opacity: 0.55; }
+
+/* ===== 3D INTRO ===== */
+#intro-container {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: #000;
+    cursor: pointer;
+}
+
+#intro-container canvas {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+#intro-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1001;
+    pointer-events: none;
+}
+
+.intro-title {
+    font-family: 'VT323', monospace;
+    font-size: 2.6rem;
+    letter-spacing: 0.28em;
+    color: rgba(255, 255, 255, 0.85);
+    text-transform: lowercase;
+    user-select: none;
+    opacity: 0;
+    animation: introFadeIn 1.2s ease forwards;
+    text-shadow: 0 0 20px rgba(0,255,65,0.4), 0 0 60px rgba(0,255,65,0.15);
+}
+
+.intro-title.hide {
+    transition: opacity 0.6s ease;
+    opacity: 0 !important;
+}
+
+.intro-hint {
+    font-family: 'VT323', monospace;
+    font-size: 1.15rem;
+    letter-spacing: 0.15em;
+    color: rgba(255, 255, 255, 0.35);
+    text-transform: lowercase;
+    user-select: none;
+    margin-top: 24px;
+    opacity: 0;
+    animation: introFadeIn 1.2s ease forwards;
+}
+
+.intro-hint.hide {
+    transition: opacity 0.4s ease;
+    opacity: 0 !important;
+}
+
+
+@keyframes introFadeIn {
+    0% { opacity: 0; transform: translateY(12px) scale(0.95); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Fade-out overlay for transition to terminal */
+#intro-fadeout {
+    position: fixed;
+    inset: 0;
+    z-index: 1002;
+    background: #0a0a0a;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.8s ease;
+}
+
+#intro-fadeout.active { opacity: 1; }
+
+/* Glitch canvas overlay */
+#glitch-canvas {
+    position: fixed;
+    inset: 0;
+    z-index: 1003;
+    pointer-events: none;
+    mix-blend-mode: screen;
+    opacity: 0;
+    transition: opacity 0.08s linear;
+}
+
+/* ===== MUSIC TOGGLE ===== */
+.music-toggle {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 100;
+    font-family: 'VT323', monospace;
+    font-size: 1.05rem;
+    color: #00FF41;
+    background: rgba(0,0,0,0.6);
+    border: 1.5px solid rgba(0,255,65,0.3);
+    padding: 6px 12px;
+    cursor: pointer;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    transition: opacity 0.15s, background 0.15s;
+    display: none;
+}
+
+.music-toggle:hover {
+    background: rgba(0,255,65,0.1);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 640px) {
+    .page { padding: 36px 24px; }
+    .line { font-size: 1.05rem; }
+    .menu-item.boxed { margin-left: -8px; }
+    .intro-title { font-size: 2.2rem; }
+    .intro-hint { font-size: 1.1rem; }
+}
