@@ -102,7 +102,7 @@ const homeLines = [
     { type: 'spacer' },
     { text: '[1] APPLY', menu: true, boxed: true, menuId: 'menuApply', pause: 80 },
     { type: 'spacer' },
-    { text: '[2] MANIFESTO', menu: true, menuId: 'menuManifesto', pause: 80 },
+    { text: '[2] ABOUT', menu: true, menuId: 'menuAbout', pause: 80 },
     { type: 'spacer' },
     { text: '[3] FAQ', menu: true, menuId: 'menuFaq', pause: 80 },
 ];
@@ -113,8 +113,8 @@ const applyLines = [
     { text: 'be among the first to experience debut.', body: true },
 ];
 
-const manifestoLines = [
-    { text: 'MANIFESTO' },
+const aboutLines = [
+    { text: 'ABOUT' },
     { type: 'spacer' },
     { text: 'job hunting is broken. debut fixes it.', body: true },
     { type: 'spacer' },
@@ -136,7 +136,7 @@ document.getElementById('faqAccordion').addEventListener('click', (e) => {
 const pages = {
     home: document.getElementById('homePage'),
     apply: document.getElementById('applyPage'),
-    manifesto: document.getElementById('manifestoPage'),
+    about: document.getElementById('aboutPage'),
     faq: document.getElementById('faqPage'),
 };
 
@@ -205,13 +205,13 @@ function showPage(name) {
             });
         }
         visitedPages.apply = true;
-    } else if (name === 'manifesto') {
-        if (visitedPages.manifesto) {
-            renderInstant(document.getElementById('manifestoContent'), manifestoLines);
+    } else if (name === 'about') {
+        if (visitedPages.about) {
+            renderInstant(document.getElementById('aboutContent'), aboutLines);
         } else {
-            typewrite(document.getElementById('manifestoContent'), manifestoLines);
+            typewrite(document.getElementById('aboutContent'), aboutLines);
         }
-        visitedPages.manifesto = true;
+        visitedPages.about = true;
     } else if (name === 'faq') {
         document.querySelectorAll('.faq-item').forEach((el, i) => {
             el.classList.toggle('active-item', i === 0);
@@ -221,19 +221,19 @@ function showPage(name) {
 
 function bindMenuClicks() {
     const a = document.getElementById('menuApply');
-    const m = document.getElementById('menuManifesto');
+    const m = document.getElementById('menuAbout');
     const f = document.getElementById('menuFaq');
     if (a) a.addEventListener('click', () => showPage('apply'));
-    if (m) m.addEventListener('click', () => showPage('manifesto'));
+    if (m) m.addEventListener('click', () => showPage('about'));
     if (f) f.addEventListener('click', () => showPage('faq'));
 }
 
 document.getElementById('backFromApply').addEventListener('click', () => showPage('home'));
-document.getElementById('backFromManifesto').addEventListener('click', () => showPage('home'));
+document.getElementById('backFromAbout').addEventListener('click', () => showPage('home'));
 document.getElementById('backFromFaq').addEventListener('click', () => showPage('home'));
 
 let selectedMenu = 0;
-const menuTargets = ['apply', 'manifesto', 'faq'];
+const menuTargets = ['apply', 'about', 'faq'];
 
 function updateMenuHighlight() {
     const items = document.querySelectorAll('#homeContent .menu-item');
@@ -262,7 +262,7 @@ document.addEventListener('keydown', (e) => {
             e.preventDefault();
             showPage(menuTargets[selectedMenu]);
         } else if (e.key === '1') { selectedMenu = 0; showPage('apply'); }
-        else if (e.key === '2') { selectedMenu = 1; showPage('manifesto'); }
+        else if (e.key === '2') { selectedMenu = 1; showPage('about'); }
         else if (e.key === '3') { selectedMenu = 2; showPage('faq'); }
     }
 
