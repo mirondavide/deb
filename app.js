@@ -510,7 +510,7 @@ var musicPlaying = false;
 var musicFadeInterval = null;
 
 function fadeInMusic() {
-    bgMusic.currentTime = 0;
+    bgMusic.currentTime = 15;
     bgMusic.volume = 0;
     bgMusic.play().then(function() {
         musicPlaying = true;
