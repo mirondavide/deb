@@ -170,144 +170,16 @@
     screenMesh.position.set(0, 1.26, -0.188);
     scene.add(screenMesh);
 
-    // Growing graph on main monitor
-    var graphStartTime = performance.now();
-    // Generate graph data points — exponential growth curve with noise
-    var graphPoints = [];
-    var GRAPH_TOTAL = 80;
-    for (var gi = 0; gi < GRAPH_TOTAL; gi++) {
-        var base = Math.pow(gi / GRAPH_TOTAL, 2.2);
-        var noise = (Math.random() - 0.5) * 0.06;
-        graphPoints.push(Math.max(0, Math.min(1, base + noise)));
-    }
-
+    // Monitor stays black throughout the entire intro
     function renderScreen(time) {
         var W = 640, H = 420;
-        var PAD_L = 55, PAD_R = 30, PAD_T = 55, PAD_B = 50;
-        var graphW = W - PAD_L - PAD_R;
-        var graphH = H - PAD_T - PAD_B;
 
-        // How many points to reveal (grows over ~8 seconds)
-        var elapsed = (time - graphStartTime) / 1000;
-        var reveal = Math.min(GRAPH_TOTAL, Math.floor(elapsed * 30));
-
-        // Background
         sCtx.fillStyle = '#0a0a0a';
         sCtx.fillRect(0, 0, W, H);
 
-        // Title
-        sCtx.font = 'bold 15px monospace';
-        sCtx.fillStyle = '#00FF41';
-        sCtx.textBaseline = 'top';
-        sCtx.fillText('DEBUT — GROWTH', PAD_L, 18);
-
-        // Axis lines
-        sCtx.strokeStyle = 'rgba(0,255,65,0.25)';
-        sCtx.lineWidth = 1;
-        sCtx.beginPath();
-        sCtx.moveTo(PAD_L, PAD_T);
-        sCtx.lineTo(PAD_L, PAD_T + graphH);
-        sCtx.lineTo(PAD_L + graphW, PAD_T + graphH);
-        sCtx.stroke();
-
-        // Grid lines
-        sCtx.strokeStyle = 'rgba(0,255,65,0.07)';
-        for (var gy = 0; gy < 5; gy++) {
-            var yy = PAD_T + graphH * (gy / 4);
-            sCtx.beginPath();
-            sCtx.moveTo(PAD_L, yy);
-            sCtx.lineTo(PAD_L + graphW, yy);
-            sCtx.stroke();
-        }
-
-        // Draw filled area under curve
-        if (reveal > 1) {
-            sCtx.beginPath();
-            sCtx.moveTo(PAD_L, PAD_T + graphH);
-            for (var pi = 0; pi < reveal; pi++) {
-                var px = PAD_L + (pi / (GRAPH_TOTAL - 1)) * graphW;
-                var py = PAD_T + graphH - graphPoints[pi] * graphH;
-                if (pi === 0) sCtx.lineTo(px, py);
-                else sCtx.lineTo(px, py);
-            }
-            var lastX = PAD_L + ((reveal - 1) / (GRAPH_TOTAL - 1)) * graphW;
-            sCtx.lineTo(lastX, PAD_T + graphH);
-            sCtx.closePath();
-            var areaGrad = sCtx.createLinearGradient(0, PAD_T, 0, PAD_T + graphH);
-            areaGrad.addColorStop(0, 'rgba(0,255,65,0.15)');
-            areaGrad.addColorStop(1, 'rgba(0,255,65,0.02)');
-            sCtx.fillStyle = areaGrad;
-            sCtx.fill();
-
-            // Draw the line
-            sCtx.beginPath();
-            for (var pi2 = 0; pi2 < reveal; pi2++) {
-                var lx = PAD_L + (pi2 / (GRAPH_TOTAL - 1)) * graphW;
-                var ly = PAD_T + graphH - graphPoints[pi2] * graphH;
-                if (pi2 === 0) sCtx.moveTo(lx, ly);
-                else sCtx.lineTo(lx, ly);
-            }
-            sCtx.strokeStyle = '#00FF41';
-            sCtx.lineWidth = 2.5;
-            sCtx.shadowColor = '#00FF41';
-            sCtx.shadowBlur = 8;
-            sCtx.stroke();
-            sCtx.shadowBlur = 0;
-
-            // Glowing dot at the tip
-            var tipX = PAD_L + ((reveal - 1) / (GRAPH_TOTAL - 1)) * graphW;
-            var tipY = PAD_T + graphH - graphPoints[reveal - 1] * graphH;
-            sCtx.beginPath();
-            sCtx.arc(tipX, tipY, 4, 0, Math.PI * 2);
-            sCtx.fillStyle = '#00FF41';
-            sCtx.shadowColor = '#00FF41';
-            sCtx.shadowBlur = 12;
-            sCtx.fill();
-            sCtx.shadowBlur = 0;
-
-            // Value label at tip
-            var pct = Math.round(graphPoints[reveal - 1] * 100);
-            sCtx.font = 'bold 13px monospace';
-            sCtx.fillStyle = '#00FF41';
-            sCtx.fillText(pct + '%', tipX + 8, tipY - 6);
-        }
-
-        // Y-axis labels
-        sCtx.font = '11px monospace';
-        sCtx.fillStyle = 'rgba(0,255,65,0.4)';
-        sCtx.textAlign = 'right';
-        sCtx.textBaseline = 'middle';
-        for (var yl = 0; yl <= 4; yl++) {
-            sCtx.fillText((yl * 25) + '%', PAD_L - 8, PAD_T + graphH - (yl / 4) * graphH);
-        }
-        sCtx.textAlign = 'left';
-
-        // X-axis label
-        sCtx.font = '11px monospace';
-        sCtx.fillStyle = 'rgba(0,255,65,0.35)';
-        sCtx.textBaseline = 'top';
-        sCtx.fillText('TIME', PAD_L + graphW - 25, PAD_T + graphH + 12);
-
-        // Restart the graph when it finishes
-        if (reveal >= GRAPH_TOTAL && elapsed > (GRAPH_TOTAL / 30) + 2) {
-            graphStartTime = time;
-        }
-
-        // CRT scanlines
+        // CRT scanlines on black screen
         sCtx.fillStyle = 'rgba(0, 0, 0, 0.10)';
         for (var sy = 0; sy < H; sy += 3) { sCtx.fillRect(0, sy, W, 1); }
-
-        // Vignette
-        var grad = sCtx.createRadialGradient(W/2, H/2, W*0.28, W/2, H/2, W*0.65);
-        grad.addColorStop(0, 'rgba(0,0,0,0)');
-        grad.addColorStop(1, 'rgba(0,0,0,0.4)');
-        sCtx.fillStyle = grad;
-        sCtx.fillRect(0, 0, W, H);
-
-        // Screen edge glow
-        sCtx.strokeStyle = 'rgba(0,255,65,0.06)';
-        sCtx.lineWidth = 4;
-        sCtx.strokeRect(2, 2, W - 4, H - 4);
 
         screenTexture.needsUpdate = true;
     }
@@ -1343,12 +1215,7 @@
             introHint.classList.add('hide');
         }
 
-        // Trigger fadeout
-        if (progress > 0.84 && !fadeout.classList.contains('active')) {
-            fadeout.classList.add('active');
-        }
-
-        // Done
+        // Done — skip black screen, go directly to final page
         if (progress >= 1) {
             phase = 'done';
             cancelAnimationFrame(animId);
@@ -1356,12 +1223,8 @@
             container.style.display = 'none';
             PostFX.destroy();
             GlitchFX.destroy();
-            setTimeout(function() {
-                fadeout.style.transition = 'opacity 0.6s ease';
-                fadeout.style.opacity = '0';
-                setTimeout(function() { fadeout.style.display = 'none'; }, 600);
-                boot();
-            }, 300);
+            fadeout.style.display = 'none';
+            boot();
         }
     }
 
