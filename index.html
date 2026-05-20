@@ -68,29 +68,37 @@
             <form id="waitlistForm" style="display:none" aria-label="Waitlist signup form">
                 <div class="form-group">
                     <label for="email">EMAIL ADDRESS</label>
-                    <input type="email" id="email" name="email" placeholder="you@example.com" required>
+                    <div class="terminal-input">
+                        <input type="email" id="email" name="email" placeholder="you@example.com" required>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label for="linkedin">LINKEDIN PROFILE <span class="opt">(OPTIONAL)</span></label>
-                    <input type="url" id="linkedin" name="linkedin" placeholder="https://linkedin.com/in/yourname">
+                    <div class="terminal-input">
+                        <input type="url" id="linkedin" name="linkedin" placeholder="https://linkedin.com/in/yourname">
+                    </div>
                 </div>
                 <div class="form-group">
                     <label for="price">HOW MUCH WOULD YOU PAY MONTHLY? ($/MO)</label>
-                    <input type="number" id="price" name="price" placeholder="e.g. 5" min="0" step="1" required>
+                    <div class="terminal-input">
+                        <input type="number" id="price" name="price" placeholder="e.g. 5" min="0" step="1" required>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label for="role">WHAT BEST DESCRIBES YOU?</label>
-                    <select id="role" name="role" required>
-                        <option value="" disabled selected>-- SELECT --</option>
-                        <option value="student">Student / Undergrad</option>
-                        <option value="new_grad">Recent graduate</option>
-                        <option value="career_switcher">Career switcher</option>
-                        <option value="junior_engineer">Junior engineer / developer</option>
-                        <option value="designer">Designer (product / UX / UI)</option>
-                        <option value="marketer">Marketer / Growth</option>
-                        <option value="pm">Product manager</option>
-                        <option value="other">Other</option>
-                    </select>
+                    <div class="terminal-input">
+                        <select id="role" name="role" required>
+                            <option value="" disabled selected>-- SELECT --</option>
+                            <option value="student">Student / Undergrad</option>
+                            <option value="new_grad">Recent graduate</option>
+                            <option value="career_switcher">Career switcher</option>
+                            <option value="junior_engineer">Junior engineer / developer</option>
+                            <option value="designer">Designer (product / UX / UI)</option>
+                            <option value="marketer">Marketer / Growth</option>
+                            <option value="pm">Product manager</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
                 </div>
                 <button type="submit" class="submit-btn" id="submitBtn" aria-label="Submit waitlist form">[ SUBMIT ]</button>
                 <p class="form-note">no spam, ever. we'll only email you when debut launches.</p>

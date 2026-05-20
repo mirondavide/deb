@@ -125,13 +125,22 @@ body {
     font-weight: 400;
 }
 
+.terminal-input {
+    display: flex;
+    align-items: center;
+    border-bottom: 1.5px solid rgba(0,255,65,0.35);
+}
+
+.terminal-input:focus-within {
+    border-bottom-color: #00FF41;
+}
+
 .form-group input,
 .form-group select {
     width: 100%;
     padding: 8px 0;
     background: transparent;
     border: none;
-    border-bottom: 1.5px solid rgba(0,255,65,0.35);
     color: #00FF41;
     font-family: 'VT323', monospace;
     font-size: 1.15rem;
@@ -139,11 +148,8 @@ body {
     border-radius: 0;
     appearance: none;
     -webkit-appearance: none;
-}
-
-.form-group input:focus,
-.form-group select:focus {
-    border-bottom-color: #00FF41;
+    caret-color: #00FF41;
+    caret-shape: block;
 }
 
 .form-group input::placeholder {
