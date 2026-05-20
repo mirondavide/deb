@@ -510,7 +510,7 @@ var musicPlaying = false;
 var musicFadeInterval = null;
 
 function fadeInMusic() {
-    bgMusic.currentTime = 15;
+    bgMusic.currentTime = 19;
     bgMusic.volume = 0;
     bgMusic.play().then(function() {
         musicPlaying = true;
@@ -538,7 +538,7 @@ musicBtn.addEventListener('click', function() {
         musicPlaying = false;
         musicBtn.textContent = '♪ MUSIC: OFF';
     } else {
-        bgMusic.currentTime = bgMusic.currentTime || 30;
+        bgMusic.currentTime = bgMusic.currentTime || 34;
         bgMusic.volume = 0.08;
         bgMusic.play();
         musicPlaying = true;
