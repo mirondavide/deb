@@ -1264,6 +1264,7 @@
         container.removeEventListener('touchstart', onIntroClick);
 
         initAudio();
+        fadeInMusic();
 
         // Capture current camera position from orbit
         var startPos = camera.position.clone();
