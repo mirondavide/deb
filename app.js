@@ -15,17 +15,27 @@ function typeSound() {
     if (!audioCtx) return;
     const ctx = audioCtx;
     const t = ctx.currentTime;
-    const p = 0.9 + Math.random() * 0.2;
+    const p = 0.95 + Math.random() * 0.1;
 
+    // Soft tap — gentle sine ping
+    const osc = ctx.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(800 * p, t);
+    osc.frequency.exponentialRampToValueAtTime(300, t + 0.02);
+    const gOsc = ctx.createGain();
+    gOsc.gain.setValueAtTime(0.04, t);
+    gOsc.gain.exponentialRampToValueAtTime(0.001, t + 0.025);
+    osc.connect(gOsc); gOsc.connect(ctx.destination);
+    osc.start(t); osc.stop(t + 0.03);
+
+    // Gentle brush — quiet filtered noise
     const s1 = ctx.createBufferSource(); s1.buffer = noiseBuffer;
-    const f1 = ctx.createBiquadFilter(); f1.type = 'lowpass'; f1.frequency.value = 600 * p; f1.Q.value = 0.7;
-    const g1 = ctx.createGain(); g1.gain.setValueAtTime(0.22, t); g1.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
-    s1.connect(f1); f1.connect(g1); g1.connect(ctx.destination); s1.start(t); s1.stop(t + 0.05);
-
-    const s2 = ctx.createBufferSource(); s2.buffer = noiseBuffer;
-    const f2 = ctx.createBiquadFilter(); f2.type = 'bandpass'; f2.frequency.value = 4000 * p; f2.Q.value = 2;
-    const g2 = ctx.createGain(); g2.gain.setValueAtTime(0.10, t); g2.gain.exponentialRampToValueAtTime(0.001, t + 0.018);
-    s2.connect(f2); f2.connect(g2); g2.connect(ctx.destination); s2.start(t); s2.stop(t + 0.02);
+    const f1 = ctx.createBiquadFilter(); f1.type = 'bandpass'; f1.frequency.value = 2000 * p; f1.Q.value = 0.8;
+    const g1 = ctx.createGain();
+    g1.gain.setValueAtTime(0.03, t);
+    g1.gain.exponentialRampToValueAtTime(0.001, t + 0.02);
+    s1.connect(f1); f1.connect(g1); g1.connect(ctx.destination);
+    s1.start(t); s1.stop(t + 0.025);
 }
 
 document.addEventListener('keydown', (e) => {
@@ -195,14 +205,16 @@ function showPage(name) {
         form.style.display = 'none';
         document.getElementById('successState').classList.remove('active');
         document.getElementById('errorMsg').classList.remove('active');
+        function showApplyForm() {
+            var cursor = document.querySelector('#applyContent .cursor');
+            if (cursor) cursor.style.display = 'none';
+            form.style.display = 'block';
+            document.getElementById('email').focus();
+        }
         if (visitedPages.apply) {
-            renderInstant(document.getElementById('applyContent'), applyLines, () => {
-                form.style.display = 'block';
-            });
+            renderInstant(document.getElementById('applyContent'), applyLines, showApplyForm);
         } else {
-            typewrite(document.getElementById('applyContent'), applyLines, () => {
-                form.style.display = 'block';
-            });
+            typewrite(document.getElementById('applyContent'), applyLines, showApplyForm);
         }
         visitedPages.apply = true;
     } else if (name === 'about') {
@@ -510,7 +522,7 @@ var musicPlaying = false;
 var musicFadeInterval = null;
 
 function fadeInMusic() {
-    bgMusic.currentTime = 19;
+    bgMusic.currentTime = 14;
     bgMusic.volume = 0;
     bgMusic.play().then(function() {
         musicPlaying = true;
@@ -520,8 +532,8 @@ function fadeInMusic() {
         clearInterval(musicFadeInterval);
         musicFadeInterval = setInterval(function() {
             vol += 0.02;
-            if (vol >= 0.08) {
-                vol = 0.08;
+            if (vol >= 0.05) {
+                vol = 0.05;
                 clearInterval(musicFadeInterval);
             }
             bgMusic.volume = vol;
@@ -538,8 +550,8 @@ musicBtn.addEventListener('click', function() {
         musicPlaying = false;
         musicBtn.textContent = '♪ MUSIC: OFF';
     } else {
-        bgMusic.currentTime = bgMusic.currentTime || 34;
-        bgMusic.volume = 0.08;
+        bgMusic.currentTime = bgMusic.currentTime || 14;
+        bgMusic.volume = 0.05;
         bgMusic.play();
         musicPlaying = true;
         musicBtn.textContent = '♪ MUSIC: ON';
