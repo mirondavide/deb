@@ -520,8 +520,8 @@ function fadeInMusic() {
         clearInterval(musicFadeInterval);
         musicFadeInterval = setInterval(function() {
             vol += 0.02;
-            if (vol >= 0.15) {
-                vol = 0.15;
+            if (vol >= 0.08) {
+                vol = 0.08;
                 clearInterval(musicFadeInterval);
             }
             bgMusic.volume = vol;
@@ -539,7 +539,7 @@ musicBtn.addEventListener('click', function() {
         musicBtn.textContent = '♪ MUSIC: OFF';
     } else {
         bgMusic.currentTime = bgMusic.currentTime || 30;
-        bgMusic.volume = 0.15;
+        bgMusic.volume = 0.08;
         bgMusic.play();
         musicPlaying = true;
         musicBtn.textContent = '♪ MUSIC: ON';
