@@ -462,7 +462,6 @@ document.getElementById('waitlistForm').addEventListener('submit', async (e) => 
 
     const email = document.getElementById('email').value.trim().toLowerCase();
     const linkedin = document.getElementById('linkedin').value.trim();
-    const price = document.getElementById('price').value;
     const role = document.getElementById('role').value;
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -474,12 +473,6 @@ document.getElementById('waitlistForm').addEventListener('submit', async (e) => 
 
     if (linkedin && !linkedin.match(/^https?:\/\/(www\.)?linkedin\.com\//)) {
         errorMsg.textContent = 'error: invalid linkedin url.';
-        errorMsg.classList.add('active');
-        return;
-    }
-
-    if (!price || isNaN(price) || Number(price) < 0) {
-        errorMsg.textContent = 'error: price must be 0 or more.';
         errorMsg.classList.add('active');
         return;
     }
@@ -497,7 +490,6 @@ document.getElementById('waitlistForm').addEventListener('submit', async (e) => 
     const formData = new FormData();
     formData.append('entry.1987568372', email);
     formData.append('entry.1176068081', linkedin);
-    formData.append('entry.90417696', price);
     formData.append('entry.1087707908', role);
 
     try {
